@@ -1,6 +1,7 @@
 #include "my_average.h"
 #include "chapt_7_practice.h"
 #include "chapt_8_demo.h"
+#include "chapt_8_practice.h"
 
 #include <stdio.h>
 
@@ -10,6 +11,7 @@ int main(int argc, char **argv)
     printf("average: %lf\n", a);
     chapt_7_run();
     chapt_8_demo_run();
+    chapt_8_practice_run();
 
     return 0;
 }
