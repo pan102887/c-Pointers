@@ -13,5 +13,9 @@ int main(int argc, char **argv)
     chapt_8_demo_run();
     chapt_8_practice_run();
 
+    int array[4] = {0, 1, 2, 3};
+
+    printf("%d\n", 2[array]);
+
     return 0;
 }
