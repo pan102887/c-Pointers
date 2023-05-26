@@ -143,26 +143,14 @@ void test_array_offset(void)
     assert(result6 == 88 || !printf("result actual is: %d\n", result6));
 }
 
-double average_1(int nnumber, ...)
+int[8][2] eight_queens(void)
 {
-    va_list number_params;
-    va_start(number_params, nnumber);
-    double sum = 0;
-    for (int i = 0; i < nnumber; i++)
+    int[8][2] result;
+    for (int i = 0; i < 8; i++)
     {
-        sum += va_arg(number_params, int);
+        
     }
-    va_end(number_params);
-    return sum / nnumber;
-}
-
-void test_average(void)
-{
-    double result1 = average_1(3, 1, 2, 3);
-    assert(result1 == 2.0 || !printf("result actual is: %f\n", result1));
-
-    double result2 = average_1(5, 1, 2, 3, 4, 5);
-    assert(result2 == 3.0 || !printf("result actual is: %f\n", result2));
+    return result;
 }
 
 void chapt_8_practice_run(void)
@@ -171,6 +159,5 @@ void chapt_8_practice_run(void)
     test_identity_matrix();
     test_matrix_multiply();
     test_array_offset();
-    test_average();
     printf("====================chapt_8_practice====================\n\n");
 }

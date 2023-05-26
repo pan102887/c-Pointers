@@ -30,6 +30,16 @@ int matrix_multiply(int *mat1, int *mat2, int *r, int x, int y, int z);
  */
 int array_offset(int arrayinfo[], ...);
 
+/**
+ * @brief 八皇后问题
+ *        皇后可以攻击同一行、同一列、同一对角线上的棋子
+ *        在一个 8 * 8 的棋盘上，放置 8 个皇后，使得任意两个皇后都不能互相攻击
+ *        
+ * 
+ * @return int[8][2] 八个皇后的位置
+ */
+int[8][2] eight_queens(void);
+
 void chapt_8_practice_run(void);
 
 #endif
