@@ -143,14 +143,8 @@ void test_array_offset(void)
     assert(result6 == 88 || !printf("result actual is: %d\n", result6));
 }
 
-int[8][2] eight_queens(void)
-{
-    int[8][2] result;
-    for (int i = 0; i < 8; i++)
-    {
-        
-    }
-    return result;
+int eight_queens(int *result[8][2]) {
+    return 0;
 }
 
 void chapt_8_practice_run(void)

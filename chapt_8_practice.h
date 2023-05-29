@@ -38,7 +38,7 @@ int array_offset(int arrayinfo[], ...);
  * 
  * @return int[8][2] 八个皇后的位置
  */
-int[8][2] eight_queens(void);
+int eight_queens(int *result[8][2]);
 
 void chapt_8_practice_run(void);
 
