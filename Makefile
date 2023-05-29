@@ -1,7 +1,7 @@
 cc := gcc
 project := c-demo
 
-object := main.o my_average.o chapt_7_practice.o
+object := main.o my_average.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o
 
 
 c-demo: ${object}
@@ -15,6 +15,12 @@ my_average.o: my_average.c my_average.h
 
 chapt_7_practice.o: chapt_7_practice.h chapt_7_practice.c
 	${cc} -c chapt_7_practice.c -o chapt_7_practice.o	
+
+chapt_8_demo.o: chapt_8_demo.c chapt_8_demo.h
+	${cc} -c chapt_8_demo.c -o chapt_8_demo.o
+
+chapt_8_practice.o: chapt_8_practice.c chapt_8_practice.h
+	${cc} -c chapt_8_practice.c -o chapt_8_practice.o
 
 .PHONY: clean
 clean:
