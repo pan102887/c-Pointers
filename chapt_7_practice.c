@@ -1,5 +1,10 @@
 #include "chapt_7_practice.h"
 
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdarg.h>
+
 int hermite(int n, int x)
 {
     if (n <= 0)
@@ -75,6 +80,7 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...)
     return __printf_chk(__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack());
 }
 
+#ifdef _TEST_
 void chapt_7_run(void)
 {
     printf("--------------------chapt_7_practice--------------------\n");
@@ -86,3 +92,4 @@ void chapt_7_run(void)
     my_printf("this is test for \"my_print\", number:%d\n", 10);
     printf("====================chapt_7_practice====================\n\n");
 }
+#endif
