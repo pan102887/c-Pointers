@@ -9,5 +9,10 @@
  *        的存储空间大小。
  *        可以认识到，
  */
+typedef struct LinkedListNode
+{
+    char *data;
+    struct LinkedListNode *next;
+} LinkedListNode;
 
 #endif

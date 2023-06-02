@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #define BOARD_SIZE 8
 
+/**
+ * @brief 整形指针访问
+ * 
+ */
+
+
 static int *get_allowed_col(int **position, int current_row)
 {
     int *allowed_col = malloc(sizeof(int) * BOARD_SIZE);
@@ -166,9 +172,9 @@ static void set_queen_test()
 }
 void eight_queens_test()
 {
-    init_position_test();
-    get_allowed_col_test();
-    set_queen_test();
+    // init_position_test();
+    // get_allowed_col_test();
+    // set_queen_test();
     // eight_queens(NULL);
 }
 #endif

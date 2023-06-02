@@ -127,9 +127,10 @@ void test_average() {
 
 
 #ifdef _TEST_
+static const char* title = "chapt_8_demo";
 void chapt_8_demo_run(void)
 {
-    printf("--------------------chapt_8_demo--------------------\n");
+    print_dividing_line(title);
     array_demo();
     int mat[3][10] = {
         {1, 2, 3, 4, 5, 6, 7, 8, 9},
@@ -145,6 +146,6 @@ void chapt_8_demo_run(void)
 
     test_average();
 
-    printf("====================chapt_8_demo====================\n\n");
+    print_dividing_line("");
 }
 #endif

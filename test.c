@@ -52,11 +52,7 @@ int solve(int row) {
     return found;
 }
 
-#define ARRAY(p, i) (*((int*)(p + i)))
 int main() {
-    // solve(0);
-    int * p = malloc(sizeof(int) * 10);
-    p[5] = 9;
-    printf("%d\n", ARRAY(p, 5));
+    solve(0);
     return 0;
 }

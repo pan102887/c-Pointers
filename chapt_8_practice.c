@@ -150,14 +150,14 @@ void test_array_offset(void)
 }
 
 
-
 #ifdef _TEST_
+static const char* title = "chapt_8_practice";
 void chapt_8_practice_run(void)
 {
-    printf("--------------------chapt_8_practice--------------------\n");
+    print_dividing_line(title);
     test_identity_matrix();
     test_matrix_multiply();
     test_array_offset();
-    printf("====================chapt_8_practice====================\n\n");
+    print_dividing_line("");
 }
 #endif

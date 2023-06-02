@@ -81,15 +81,17 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...)
 }
 
 #ifdef _TEST_
+
+static const char *title = "chapt_7_practice";
 void chapt_7_run(void)
 {
-    printf("--------------------chapt_7_practice--------------------\n");
+    print_dividing_line(title);
     printf("hermite(3, 2)-> expect: 40, actual: %d\n", hermite(3, 2));
     printf("my_gcd(6, 3)-> expect: 3, actual: %d\n", my_gcd(6, 3));
     printf("my_gcd(6, 4)-> expect: 2, actual: %d\n", my_gcd(6, 4));
     printf("ascii_to_integer(\"123\")-> expect: 123, actual: %d\n", ascii_to_integer("123"));
     printf("max_list(4, 3, 2, 5, 6)-> expect: 6, actual: %d\n", max_list(4, 3, 2, 5, 6));
     my_printf("this is test for \"my_print\", number:%d\n", 10);
-    printf("====================chapt_7_practice====================\n\n");
+    print_dividing_line("");
 }
 #endif
