@@ -34,7 +34,7 @@ global.o: global.c global.h ${common}
 
 .PHONY: clean
 clean:
-	-rm ${object}
+	-rm ${object} ${project}
 
 clean-all:
 	-rm ${object} ${project}
