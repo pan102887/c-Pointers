@@ -1,5 +1,7 @@
 #include "eight_queens.h"
 
+#include "global.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #define BOARD_SIZE 8

@@ -1,6 +1,6 @@
 #ifndef _CHAPT_8_PRACTICE_H_
 #define _CHAPT_8_PRACTICE_H_
-#include "global.h"
+
 
 void array_demo(void);
 void func_1(int *mat, int row, int col);
@@ -9,6 +9,6 @@ int lookup_keyword(char const * const desired_word, char const *keyword_table[],
 double average(int n_value, ...);
 
 #ifdef _TEST_
-void chapt_8_demo_run(void);
+void chapt_8_demo_run();
 #endif
 #endif

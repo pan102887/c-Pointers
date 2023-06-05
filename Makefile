@@ -1,7 +1,7 @@
 cc := gcc
 project := c-demo
 
-object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o
+object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o
 common := 
 
 
@@ -28,6 +28,9 @@ linked_list.o: linked_list.c linked_list.h ${common}
 
 chapt_9_demo.o: chapt_9_demo.c chapt_9_demo.h ${common}
 	${cc} -c chapt_9_demo.c -o chapt_9_demo.o
+
+kmp.o: kmp.c kmp.h ${common}
+	${cc} -c kmp.c -o kmp.o
 
 global.o: global.c global.h ${common}
 	${cc} -c global.c -o global.o

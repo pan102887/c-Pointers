@@ -1,5 +1,7 @@
 #include "chapt_8_demo.h"
 
+#include "global.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -128,7 +130,7 @@ void test_average() {
 
 #ifdef _TEST_
 static const char* title = "chapt_8_demo";
-void chapt_8_demo_run(void)
+void chapt_8_demo_run()
 {
     print_dividing_line(title);
     array_demo();
@@ -143,7 +145,6 @@ void chapt_8_demo_run(void)
 
     i = lookup_keyword_without_length("while", keyword);
     printf("i: %d\n", i);
-
     test_average();
 
     print_dividing_line("");

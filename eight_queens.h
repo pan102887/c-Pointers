@@ -1,6 +1,5 @@
 #ifndef _EIGHT_QUEENS_H_
 #define _EIGHT_QUEENS_H_
-#include "global.h"
 
 /**
  * @brief 八皇后问题

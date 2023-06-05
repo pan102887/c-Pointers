@@ -1,7 +1,7 @@
 #ifndef _CHAPT_7_PRACTICE_H_
 #define _CHAPT_7_PRACTICE_H_
-#include "global.h"
 #include <stdio.h>
+#include "global.h"
 
 /**
  * Hermite Polynomials(厄密多项式)
@@ -17,7 +17,8 @@ int ascii_to_integer(char *string);
 int max_list(int n_numbers, ...);
 
 __fortify_function int my_printf(const char *__restrict __fmt, ...);
+
 #ifdef _TEST_
-void chapt_7_run(void);
+void chapt_7_practice_run(void);
 #endif
 #endif

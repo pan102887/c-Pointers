@@ -1,5 +1,7 @@
 #include "chapt_7_practice.h"
 
+#include "global.h"
+
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
@@ -83,7 +85,7 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...)
 #ifdef _TEST_
 
 static const char *title = "chapt_7_practice";
-void chapt_7_run(void)
+void chapt_7_practice_run(void)
 {
     print_dividing_line(title);
     printf("hermite(3, 2)-> expect: 40, actual: %d\n", hermite(3, 2));

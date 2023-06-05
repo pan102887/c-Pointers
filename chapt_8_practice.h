@@ -1,6 +1,5 @@
 #ifndef _CHAPTER_8_PRACTICE_H_
 #define _CHAPTER_8_PRACTICE_H_
-#include "global.h"
 
 int identity_matrix(int *mat, int nmat);
 /**

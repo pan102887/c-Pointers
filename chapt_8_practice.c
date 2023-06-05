@@ -1,4 +1,5 @@
 #include "chapt_8_practice.h"
+#include "global.h"
 
 #include <stdio.h>
 #include <stdlib.h>

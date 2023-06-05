@@ -4,6 +4,7 @@
 #include "linked_list.h"
 #include "eight_queens.h"
 #include "chapt_9_demo.h"
+#include "kmp.h"
 #include "global.h"
 
 #include <stdio.h>
@@ -12,12 +13,12 @@
 
 #ifdef _TEST_
 void test() {
-    chapt_7_run();
+    chapt_7_practice_run();
     chapt_8_demo_run();
     chapt_8_practice_run();
-    eight_queens_test();
     chapt_9_demo_run();
-    
+    eight_queens_test();
+    kmp_test();
 }
 #endif
 

@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
+#include <locale.h>
 
 
 /**
@@ -53,23 +55,7 @@ void string_test() {
     free(str);
 }
 
-void complex_char_set_test() {
-    char *str = "中文测试";
-    printf("str: %s\n", str);
-    size_t len = strlen(str);
-    printf("str len: %ld\n", len);
 
-    char str_2[] = "中文测试";
-    len = strlen(str_2);
-    printf("str_2: %s\n", str_2);
-    for (int i = 0; i < len; i++)
-    {
-        printf("%#x ", str_2[i]);
-    }
-    printf("\n");
-
-    printf("%s\n", "中");
-}
 
 
 #ifdef _TEST_
@@ -77,7 +63,6 @@ static const char *title = "chapt_9_demo";
 void chapt_9_demo_run() {
     print_dividing_line(title);
     string_test();
-    complex_char_set_test();
     print_dividing_line("");
 }
 #endif
