@@ -150,9 +150,8 @@ void test_array_offset(void)
     assert(result6 == 88 || !printf("result actual is: %d\n", result6));
 }
 
-
 #ifdef _TEST_
-static const char* title = "chapt_8_practice";
+static const char *title = "chapt_8_practice";
 void chapt_8_practice_run(void)
 {
     print_dividing_line(title);

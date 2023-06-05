@@ -8,9 +8,8 @@
 
 /**
  * @brief 整形指针访问
- * 
+ *
  */
-
 
 static int *get_allowed_col(int **position, int current_row)
 {
@@ -24,7 +23,8 @@ static int *get_allowed_col(int **position, int current_row)
     {
         const int row = position[i][0];
         const int col = position[i][1];
-        if (row <= 0 || col <= 0 || row > BOARD_SIZE || col > BOARD_SIZE) {
+        if (row <= 0 || col <= 0 || row > BOARD_SIZE || col > BOARD_SIZE)
+        {
             continue;
         }
 

@@ -5,15 +5,16 @@
 
 #define DIVIDING_LINE_LEN 100
 
-
-static void print_prefix(size_t len, char c) {
+static void print_prefix(size_t len, char c)
+{
     for (size_t i = 0; i < len; i++)
     {
         printf("%c", c);
     }
 }
 
-static void print_suffix(size_t len, char c) {
+static void print_suffix(size_t len, char c)
+{
     for (size_t i = 0; i < len; i++)
     {
         printf("%c", c);
@@ -21,9 +22,8 @@ static void print_suffix(size_t len, char c) {
     printf("\n");
 }
 
-
-
-void print_dividing_line(const char *str) {
+void print_dividing_line(const char *str)
+{
     size_t str_len = strlen(str);
     if (str_len >= DIVIDING_LINE_LEN)
     {

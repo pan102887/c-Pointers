@@ -7,18 +7,18 @@
 #include <wchar.h>
 #include <locale.h>
 
-
 /**
  * @brief 第九章
  *        字符串、字符和字节
  */
 
-void string_test() {
-    const int  size = 10;
+void string_test()
+{
+    const int size = 10;
     char *str = malloc(size + 1);
     for (int i = 0; i < size; i++)
     {
-        
+
         str[i] = (char)(i + '1');
     }
     str[size - 1] = '\0';
@@ -55,12 +55,10 @@ void string_test() {
     free(str);
 }
 
-
-
-
 #ifdef _TEST_
 static const char *title = "chapt_9_demo";
-void chapt_9_demo_run() {
+void chapt_9_demo_run()
+{
     print_dividing_line(title);
     string_test();
     print_dividing_line("");

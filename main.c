@@ -9,10 +9,9 @@
 
 #include <stdio.h>
 
-
-
 #ifdef _TEST_
-void test() {
+void test()
+{
     chapt_7_practice_run();
     chapt_8_demo_run();
     chapt_8_practice_run();

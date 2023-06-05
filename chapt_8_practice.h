@@ -27,6 +27,4 @@ int array_offset(int arrayinfo[], ...);
 void chapt_8_practice_run(void);
 #endif
 
-
-
 #endif

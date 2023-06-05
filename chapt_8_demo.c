@@ -15,8 +15,7 @@ char const *keyword[] = {
     "return",
     "switch",
     "while",
-    NULL
-};
+    NULL};
 
 #define NKEYS (sizeof(keyword) / sizeof(keyword[0]))
 
@@ -33,7 +32,7 @@ int lookup_keyword(char const *const desired_word, char const *keyword_table[], 
     return -1;
 }
 
-int lookup_keyword_without_length(char const * const desired_word, char const *keyword_table[])
+int lookup_keyword_without_length(char const *const desired_word, char const *keyword_table[])
 {
     char const **kwp;
     for (kwp = keyword_table; *kwp != NULL; kwp++)
@@ -104,32 +103,31 @@ void func_2(int mat[3][10])
 double average(int n_value, ...)
 {
 
-	int count = 0;
-	double sum = 0;
+    int count = 0;
+    double sum = 0;
 
-	va_list var_arg;
-	va_start(var_arg, n_value);
+    va_list var_arg;
+    va_start(var_arg, n_value);
 
-	for (; count < n_value; count += 1)
-	{
-		int p = (va_arg(var_arg, int));
-		printf("%d\n", p);
-		sum += p;
-	}
+    for (; count < n_value; count += 1)
+    {
+        int p = (va_arg(var_arg, int));
+        printf("%d\n", p);
+        sum += p;
+    }
 
-	va_end(var_arg);
-	return sum / n_value;
+    va_end(var_arg);
+    return sum / n_value;
 }
 
-void test_average() {
+void test_average()
+{
     double a = average(5, 2, 3, 4, 5, 8);
     printf("average: %lf\n", a);
 }
 
-
-
 #ifdef _TEST_
-static const char* title = "chapt_8_demo";
+static const char *title = "chapt_8_demo";
 void chapt_8_demo_run()
 {
     print_dividing_line(title);
