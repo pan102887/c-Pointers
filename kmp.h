@@ -2,14 +2,15 @@
 #define _KMP_H_
 #include <stddef.h>
 
+#define CHARACTERS 256
 typedef struct kmp
 {
     size_t pattern_len;
-    char (*dfa)[256];
+    int **dfa;
     size_t (*seach)(struct kmp *self, char *str);
 } kmp;
 
-void kmp_new(kmp *this, const char *pattern);
+void kmp_init(kmp *this, const char *pattern);
 void kmp_delete(kmp *this);
 
 #ifdef _TEST_
