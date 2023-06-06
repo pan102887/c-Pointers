@@ -11,8 +11,8 @@ kmp *kmp_new_inited(const char *pattern);
 static size_t search(kmp *this, char *str);
 static char *kmp_strstr(kmp *this, char *str);
 void kmp_delete(kmp *this);
-void allocate_dfa_memory(kmp *this);
-void init_dfa(kmp *this, const char *pattern);
+int **allocate_dfa_memory(size_t pattern_len);
+int **init_dfa(const char *pattern, size_t pattern_len);
 
 static size_t search(kmp *this, char *str)
 {
@@ -44,36 +44,36 @@ static char *kmp_strstr(kmp *this, char *str)
     }
 }
 
-void allocate_dfa_memory(kmp *this)
+int **allocate_dfa_memory(size_t pattern_len)
 {
-    this->dfa = malloc(CHARACTERS * sizeof(int *));
+    int **dfa = malloc(CHARACTERS * sizeof(int *));
     for (size_t i = 0; i < CHARACTERS; i++)
     {
-        this->dfa[i] = malloc(sizeof(int) * this->pattern_len);
-        for (size_t j = 0; j < this->pattern_len; j++)
+        dfa[i] = malloc(sizeof(int) * pattern_len);
+        for (size_t j = 0; j < pattern_len; j++)
         {
-            this->dfa[i][j] = 0;
+            dfa[i][j] = 0;
         }
     }
+    return dfa;
 }
 
 
-void init_dfa(kmp *this, const char *pattern)
+int **init_dfa(const char *pattern, size_t pattern_len)
 {
-    size_t pattern_len = this->pattern_len;
-    allocate_dfa_memory(this);
+    int **dfa = allocate_dfa_memory(pattern_len);
 
-    this->dfa[pattern[0]][0] = 1;
+    dfa[pattern[0]][0] = 1;
     for (int x = 0, j = 1; j < pattern_len; j++)
     {
         for (int c = 0; c < CHARACTERS; c++)
         {
-            // printf("c: %d, j: %d, x: %d\n", c, j, x);
-            this->dfa[c][j] = this->dfa[c][x];
+            dfa[c][j] = dfa[c][x];
         }
-        this->dfa[pattern[j]][j] = j + 1;
-        x = this->dfa[pattern[j]][x];
+        dfa[pattern[j]][j] = j + 1;
+        x = dfa[pattern[j]][x];
     }
+    return dfa;
 }
 
 void kmp_init(kmp *this, const char *pattern)
@@ -82,11 +82,13 @@ void kmp_init(kmp *this, const char *pattern)
     {
         return;
     }
+    this->pattern_len = 0;
     this->dfa = NULL;
     this->search = NULL;
     this->kmp_strstr = NULL;
+
     this->pattern_len = strlen(pattern);
-    init_dfa(this, pattern);
+    this->dfa = init_dfa(pattern, this->pattern_len);
     this->search = search;
     this->kmp_strstr = kmp_strstr;
 }
