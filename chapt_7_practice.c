@@ -84,10 +84,10 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...)
 
 #ifdef _TEST_
 
-static const char *title = "chapt_7_practice";
+static const char *memory_boundary_alignment = "chapt_7_practice";
 void chapt_7_practice_run(void)
 {
-    print_dividing_line(title);
+    print_dividing_line(memory_boundary_alignment);
     printf("hermite(3, 2)-> expect: 40, actual: %d\n", hermite(3, 2));
     printf("my_gcd(6, 3)-> expect: 3, actual: %d\n", my_gcd(6, 3));
     printf("my_gcd(6, 4)-> expect: 2, actual: %d\n", my_gcd(6, 4));

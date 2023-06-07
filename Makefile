@@ -1,39 +1,43 @@
 cc := gcc
 project := c-demo
 
-object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o
+object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o test.o
 common := 
+common_param := -m64
 
 
 c-demo: ${object}
-	${cc} -o ${project} ${object}
+	${cc} ${common_param} -o ${project} ${object}
 
 main.o:
-	${cc} -c main.c -o main.o ${common}
+	${cc} ${common_param} -c main.c -o main.o ${common}
 
 chapt_7_practice.o: chapt_7_practice.h chapt_7_practice.c ${common}
-	${cc} -c chapt_7_practice.c -o chapt_7_practice.o	
+	${cc} ${common_param} -c chapt_7_practice.c -o chapt_7_practice.o	
 
 chapt_8_demo.o: chapt_8_demo.c chapt_8_demo.h ${common}
-	${cc} -c chapt_8_demo.c -o chapt_8_demo.o
+	${cc} ${common_param} -c chapt_8_demo.c -o chapt_8_demo.o
 
 chapt_8_practice.o: chapt_8_practice.c chapt_8_practice.h ${common}
-	${cc} -c chapt_8_practice.c -o chapt_8_practice.o
+	${cc} ${common_param} -c chapt_8_practice.c -o chapt_8_practice.o
 
 eight_queens.o: eight_queens.c eight_queens.h ${common}
-	${cc} -c eight_queens.c -o eight_queens.o
+	${cc} ${common_param} -c eight_queens.c -o eight_queens.o
 
 linked_list.o: linked_list.c linked_list.h ${common}
-	${cc} -c linked_list.c -o linked_list.o
+	${cc} ${common_param} -c linked_list.c -o linked_list.o
 
 chapt_9_demo.o: chapt_9_demo.c chapt_9_demo.h ${common}
-	${cc} -c chapt_9_demo.c -o chapt_9_demo.o
+	${cc} ${common_param} -c chapt_9_demo.c -o chapt_9_demo.o
 
 kmp.o: kmp.c kmp.h ${common}
-	${cc} -c kmp.c -o kmp.o
+	${cc} ${common_param} -c kmp.c -o kmp.o
 
 global.o: global.c global.h ${common}
-	${cc} -c global.c -o global.o
+	${cc} ${common_param} -c global.c -o global.o
+
+test.o: test.c test.h ${common}
+	${cc} ${common_param} -c test.c -o test.o
 
 .PHONY: clean
 clean:

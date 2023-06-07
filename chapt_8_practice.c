@@ -151,10 +151,10 @@ void test_array_offset(void)
 }
 
 #ifdef _TEST_
-static const char *title = "chapt_8_practice";
+static const char *memory_boundary_alignment = "chapt_8_practice";
 void chapt_8_practice_run(void)
 {
-    print_dividing_line(title);
+    print_dividing_line(memory_boundary_alignment);
     test_identity_matrix();
     test_matrix_multiply();
     test_array_offset();

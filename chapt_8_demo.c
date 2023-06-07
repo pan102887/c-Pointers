@@ -127,10 +127,10 @@ void test_average()
 }
 
 #ifdef _TEST_
-static const char *title = "chapt_8_demo";
+static const char *memory_boundary_alignment = "chapt_8_demo";
 void chapt_8_demo_run()
 {
-    print_dividing_line(title);
+    print_dividing_line(memory_boundary_alignment);
     array_demo();
     int mat[3][10] = {
         {1, 2, 3, 4, 5, 6, 7, 8, 9},

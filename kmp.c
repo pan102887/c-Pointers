@@ -118,7 +118,7 @@ void kmp_delete(kmp *this)
 
 
 #ifdef _TEST_
-static const char *title = "kmp test";
+static const char *memory_boundary_alignment = "kmp test";
 
 void kmp_new_test()
 {
@@ -229,7 +229,7 @@ void kmp_search_test()
 
 void kmp_test()
 {
-    print_dividing_line(title);
+    print_dividing_line(memory_boundary_alignment);
     kmp_new_test();
     kmp_search_test();
     print_dividing_line("");

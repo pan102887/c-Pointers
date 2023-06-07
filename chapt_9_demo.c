@@ -56,10 +56,10 @@ void string_test()
 }
 
 #ifdef _TEST_
-static const char *title = "chapt_9_demo";
+static const char *memory_boundary_alignment = "chapt_9_demo";
 void chapt_9_demo_run()
 {
-    print_dividing_line(title);
+    print_dividing_line(memory_boundary_alignment);
     string_test();
     print_dividing_line("");
 }
