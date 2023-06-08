@@ -4,8 +4,8 @@
 #include "linked_list.h"
 #include "eight_queens.h"
 #include "chapt_9_demo.h"
+#include "chapt_10_demo.h"
 #include "kmp.h"
-#include "test.h"
 #include "global.h"
 
 #include <stdio.h>
@@ -19,7 +19,7 @@ void test()
     chapt_9_demo_run();
     eight_queens_test();
     kmp_test();
-    testfunc();
+    chapt_10_demo_run();
 }
 #endif
 

@@ -1,7 +1,7 @@
 cc := gcc
 project := c-demo
 
-object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o test.o
+object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o
 common := 
 common_param := -m64
 
@@ -36,8 +36,8 @@ kmp.o: kmp.c kmp.h ${common}
 global.o: global.c global.h ${common}
 	${cc} ${common_param} -c global.c -o global.o
 
-test.o: test.c test.h ${common}
-	${cc} ${common_param} -c test.c -o test.o
+chapt_10_demo.o: chapt_10_demo.c chapt_10_demo.h ${common}
+	${cc} ${common_param} -c chapt_10_demo.c -o chapt_10_demo.o
 
 .PHONY: clean
 clean:
