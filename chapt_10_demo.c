@@ -192,6 +192,6 @@ void chapt_10_demo_run()
     memory_boundary_alignment_test();
     bit_field_test();
     union_test();
-    print_dividing_line("");
+    multi_dividing_line(2, title, "end");
 }
 #endif

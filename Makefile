@@ -1,7 +1,8 @@
 cc := gcc
 project := c-demo
 
-object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o
+object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o \
+	chapt_11_demo.o alloc.o chapt_12_demo.o
 common := 
 common_param := -m64
 
@@ -30,14 +31,25 @@ linked_list.o: linked_list.c linked_list.h ${common}
 chapt_9_demo.o: chapt_9_demo.c chapt_9_demo.h ${common}
 	${cc} ${common_param} -c chapt_9_demo.c -o chapt_9_demo.o
 
+chapt_10_demo.o: chapt_10_demo.c chapt_10_demo.h ${common}
+	${cc} ${common_param} -c chapt_10_demo.c -o chapt_10_demo.o
+
+alloc.o: alloc.c alloc.h ${common}
+	${cc} ${common_param} -c alloc.c -o alloc.o
+
+chapt_11_demo.o: chapt_11_demo.c chapt_11_demo.h ${common}
+	${cc} ${common_param} -c chapt_11_demo.c -o chapt_11_demo.o
+
+chapt_12_demo.o: chapt_12_demo.c chapt_12_demo.h ${common}
+	${cc} ${common_param} -c chapt_12_demo.c -o chapt_12_demo.o
+
 kmp.o: kmp.c kmp.h ${common}
 	${cc} ${common_param} -c kmp.c -o kmp.o
 
 global.o: global.c global.h ${common}
 	${cc} ${common_param} -c global.c -o global.o
 
-chapt_10_demo.o: chapt_10_demo.c chapt_10_demo.h ${common}
-	${cc} ${common_param} -c chapt_10_demo.c -o chapt_10_demo.o
+
 
 .PHONY: clean
 clean:

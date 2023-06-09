@@ -1,3 +1,4 @@
+#include "global.h"
 #include "chapt_7_practice.h"
 #include "chapt_8_demo.h"
 #include "chapt_8_practice.h"
@@ -5,8 +6,9 @@
 #include "eight_queens.h"
 #include "chapt_9_demo.h"
 #include "chapt_10_demo.h"
+#include "chapt_11_demo.h"
 #include "kmp.h"
-#include "global.h"
+
 
 #include <stdio.h>
 
@@ -20,6 +22,7 @@ void test()
     eight_queens_test();
     kmp_test();
     chapt_10_demo_run();
+    chapt_11_demo_run();
 }
 #endif
 

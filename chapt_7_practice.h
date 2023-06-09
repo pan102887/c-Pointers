@@ -1,7 +1,6 @@
 #ifndef _CHAPT_7_PRACTICE_H_
 #define _CHAPT_7_PRACTICE_H_
 #include <stdio.h>
-#include "global.h"
 
 /**
  * Hermite Polynomials(厄密多项式)

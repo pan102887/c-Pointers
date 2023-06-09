@@ -111,8 +111,10 @@ void kmp_delete(kmp *this)
         for (size_t i = 0; i < CHARACTERS; i++)
         {
             free(this->dfa[i]);
+            this ->dfa[i] = NULL;
         }
         free(this->dfa);
+        this->dfa = NULL;
     }
 }
 
