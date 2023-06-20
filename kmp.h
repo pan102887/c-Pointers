@@ -13,7 +13,7 @@ typedef struct kmp
 
 void kmp_init(kmp *this, const char *pattern);
 void kmp_delete(kmp *this);
-kmp* kmp_new_inited(const char* pattern);
+kmp* kmp_new_and_init(const char* pattern);
 
 #ifdef _TEST_
 void kmp_test();

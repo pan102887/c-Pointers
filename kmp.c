@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 void kmp_init(kmp *this, const char *pattern);
-kmp *kmp_new_inited(const char *pattern);
+kmp *kmp_new_and_init(const char *pattern);
 static size_t search(kmp *this, char *str);
 static char *kmp_strstr(kmp *this, char *str);
 void kmp_delete(kmp *this);
@@ -93,7 +93,7 @@ void kmp_init(kmp *this, const char *pattern)
     this->kmp_strstr = kmp_strstr;
 }
 
-kmp *kmp_new_inited(const char *pattern)
+kmp *kmp_new_and_init(const char *pattern)
 {
     kmp *this = malloc(sizeof(kmp));
     kmp_init(this, pattern);
@@ -191,7 +191,7 @@ void kmp_new_test()
 
 void kmp_search_test()
 {
-    kmp *k = kmp_new_inited("kmp");
+    kmp *k = kmp_new_and_init("kmp");
     char *str = "this is a test string for kmp";
     char *p = k->kmp_strstr(k, str);
 
