@@ -2,7 +2,7 @@ cc := gcc
 project := c-demo
 
 object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o \
-	chapt_11_demo.o alloc.o chapt_12_demo.o
+	chapt_11_demo.o alloc.o chapt_12_demo.o chapt_13_demo.o my_data.o chapt_14_demo.o
 common := 
 common_param := -m64
 
@@ -43,11 +43,20 @@ chapt_11_demo.o: chapt_11_demo.c chapt_11_demo.h ${common}
 chapt_12_demo.o: chapt_12_demo.c chapt_12_demo.h ${common}
 	${cc} ${common_param} -c chapt_12_demo.c -o chapt_12_demo.o
 
+chapt_13_demo.o: chapt_13_demo.c chapt_13_demo.h ${common}
+	${cc} ${common_param} -c chapt_13_demo.c -o chapt_13_demo.o
+
+chapt_14_demo.o: chapt_14_demo.c chapt_14_demo.h ${common}
+	${cc} ${common_param} -c chapt_14_demo.c -o chapt_14_demo.o
+
 kmp.o: kmp.c kmp.h ${common}
 	${cc} ${common_param} -c kmp.c -o kmp.o
 
 global.o: global.c global.h ${common}
 	${cc} ${common_param} -c global.c -o global.o
+
+my_data.o : my_data.c my_data.h ${common}
+	${cc} ${common_param} -c my_data.c -o my_data.o
 
 
 

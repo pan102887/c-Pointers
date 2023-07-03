@@ -1,6 +1,6 @@
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
-#include "global.h"
+#include "my_data.h"
 
 /**
  * @brief 一个简单的链表
@@ -9,10 +9,13 @@
  *        的存储空间大小。
  *        可以认识到，
  */
-typedef struct LinkedListNode
+typedef struct Node
 {
-    char *data;
-    struct LinkedListNode *next;
-} LinkedListNode;
+    void *data;
+    struct Node *next;
+} Node;
+
+int sll_insert(register Node **linkp, Node *new_node, int (*compare)(void *data1, void *data2));
+int sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *data1, void *data2), void *(*cpy)(void *data));
 
 #endif

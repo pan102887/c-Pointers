@@ -8,6 +8,8 @@
 #include "chapt_10_demo.h"
 #include "chapt_11_demo.h"
 #include "chapt_12_demo.h"
+#include "chapt_13_demo.h"
+#include "chapt_14_demo.h"
 #include "kmp.h"
 
 
@@ -25,6 +27,8 @@ void test()
     chapt_10_demo_run();
     chapt_11_demo_run();
     chapt_12_demo_test();
+    chapt_13_demo_run();
+    chapt_14_demo_run();
 }
 #endif
 
