@@ -3,6 +3,6 @@
 
 #ifdef _TEST_
 void chapt_10_demo_run(void);
-#endif
+#endif // _TEST_
 
-#endif
+#endif // _CHAPT_10_DEMO_H_

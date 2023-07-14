@@ -1,8 +1,6 @@
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 
-#define _TEST_
-
 #define TRUE 1
 #define FALSE 0
 

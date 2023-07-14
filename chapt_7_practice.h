@@ -19,5 +19,5 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...);
 
 #ifdef _TEST_
 void chapt_7_practice_run(void);
-#endif
-#endif
+#endif // _TEST_
+#endif // _CHAPT_7_PRACTICE_H_

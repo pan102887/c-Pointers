@@ -51,6 +51,6 @@ ListEntry *new_entry();
 
 #ifdef _TEST_
 void chapt_12_demo_test(void);
-#endif
+#endif // _TEST_
 
-#endif
+#endif // _CHAPT_12_DEMO_H_

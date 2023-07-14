@@ -262,4 +262,4 @@ void chapt_12_demo_test(void) {
     free_list(&entry);
     multi_dividing_line(2, "chapt_12_demo_test", "end");
 }
-#endif
+#endif // _TEST_

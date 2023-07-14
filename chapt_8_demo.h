@@ -9,5 +9,5 @@ double average(int n_value, ...);
 
 #ifdef _TEST_
 void chapt_8_demo_run();
-#endif
-#endif
+#endif // _TEST_
+#endif // _CHAPT_8_PRACTICE_H_

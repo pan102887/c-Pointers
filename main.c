@@ -1,42 +1,13 @@
-#include "global.h"
-#include "chapt_7_practice.h"
-#include "chapt_8_demo.h"
-#include "chapt_8_practice.h"
-#include "linked_list.h"
-#include "eight_queens.h"
-#include "chapt_9_demo.h"
-#include "chapt_10_demo.h"
-#include "chapt_11_demo.h"
-#include "chapt_12_demo.h"
-#include "chapt_13_demo.h"
-#include "chapt_14_demo.h"
-#include "kmp.h"
-
+#include "test.h"
 
 #include <stdio.h>
 
-#ifdef _TEST_
-void test()
-{
-    chapt_7_practice_run();
-    chapt_8_demo_run();
-    chapt_8_practice_run();
-    chapt_9_demo_run();
-    eight_queens_test();
-    kmp_test();
-    chapt_10_demo_run();
-    chapt_11_demo_run();
-    chapt_12_demo_test();
-    chapt_13_demo_run();
-    chapt_14_demo_run();
-}
-#endif
+
 
 int main(int argc, char **argv)
 {
-
 #ifdef _TEST_
-    test();
+    test_run(argc, argv);
 #else
     char v = 0x81;
     printf("%d\n", v);

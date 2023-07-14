@@ -5,11 +5,17 @@
 
 void macro_test(void)
 {
-    char *file_name = __FILE__;
-    printf("current file name: %s\n", file_name);
+    printf("current file name: %s\n", __FILE__);
 
-    int line_num = __LINE__;
-    printf("current line: %d\n", line_num);
+    printf("current line: %d\n", __LINE__);
+
+    #line 40 "chapt_15_demo.c #line test"
+
+    printf("#line 40 \"chapt_15_demo.c #line test\"\n");
+
+    printf("current file name: %s\n", __FILE__);
+
+    printf("current line: %d\n", __LINE__);
 
     char *date = __DATE__;
     printf("compile date: %s\n", date);
@@ -59,6 +65,17 @@ static void add_to_sum_test(void)
     printf("sum_number: %d\n", sum_number);
 }
 
+void micro_define_test(void)
+{
+    #ifdef MICRO
+        // MICRO is defined in Makefile
+        printf("micro is defined: %d\n", MICRO);
+    #else
+        printf("micro is not defined:\n");
+    #endif
+}
+// todo: 设计一种DEBU宏方法，可以在编译时打开或关闭调试信息
+
 void chapt_14_demo_run(void)
 {
     print_dividing_line("chapt_14_demo_run");
@@ -66,5 +83,6 @@ void chapt_14_demo_run(void)
     square_test();
     print_test();
     add_to_sum_test();
+    micro_define_test();
     print_dividing_line("");
 }

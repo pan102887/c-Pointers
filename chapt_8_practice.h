@@ -25,6 +25,6 @@ int matrix_multiply(int *mat1, int *mat2, int *r, int x, int y, int z);
 int array_offset(int arrayinfo[], ...);
 #ifdef _TEST_
 void chapt_8_practice_run(void);
-#endif
+#endif // _TEST_
 
-#endif
+#endif // _CHAPTER_8_PRACTICE_H_
