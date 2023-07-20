@@ -51,37 +51,35 @@ void file_write_test(void)
 
 }
 
-void file_test(void)
+void file_flush_test(void)
 {
-    FILE *fp = fopen("write_test.txt", "wr");
+    FILE *fp = fopen("flush_test.txt", "a+");
     if (fp == NULL) {
         perror("fopen");
         exit(EXIT_FAILURE);
     }
     fprintf(fp, "This is testing for fprintf...\n");
-    fputs("This is testing for fputs...\n", fp);
+    fflush(fp);
+    fseek(fp, 0, SEEK_SET);
+    char c;
+    while((c = getc(fp)) != EOF) {
+        putchar(c);
+    }
     fclose(fp);
 }
 
-void str_handler(char *data)
+void file_read_test(void)
 {
-    printf("str_handler: %s\n", data);
-}
-
-void int_handler(int data)
-{
-    printf("int_handler: %d\n", ++data);
-}
-
-void consumer_test(void)
-{
-    Consumer(char *) consumer;
-    consumer.accept = str_handler;
-    consumer.accept("hello world");
-
-    Consumer(int) consumer2;
-    consumer2.accept = int_handler;
-    consumer2.accept(10);
+    FILE *fp = fopen("flush_test.txt", "r");
+    if (fp == NULL) {
+        perror("fopen");
+        exit(EXIT_FAILURE);
+    }
+    char c;
+    while((c = getc(fp)) != EOF) {
+        putchar(c);
+    }
+    fclose(fp);
 }
 
 #ifdef _TEST_
@@ -91,8 +89,8 @@ void chapt_15_demo_run(void)
     perror_test();
     std_out_test();
     file_write_test();
-    file_test();
-    consumer_test();
+    file_flush_test();
+    file_read_test();
     print_dividing_line("");
 }
 #endif
