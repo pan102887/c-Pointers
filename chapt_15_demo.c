@@ -65,21 +65,29 @@ void file_flush_test(void)
     while((c = getc(fp)) != EOF) {
         putchar(c);
     }
-    fclose(fp);
+    if (fclose(fp) != 0)
+    {
+        perror("flush_test.txt");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void file_read_test(void)
 {
     FILE *fp = fopen("flush_test.txt", "r");
     if (fp == NULL) {
-        perror("fopen");
+        perror("flush_test.txt");
         exit(EXIT_FAILURE);
     }
     char c;
     while((c = getc(fp)) != EOF) {
         putchar(c);
     }
-    fclose(fp);
+    if (fclose(fp) != 0)
+    {
+        perror("fclose");
+        exit(EXIT_FAILURE);
+    }
 }
 
 #ifdef _TEST_
