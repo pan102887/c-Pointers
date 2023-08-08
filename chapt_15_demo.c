@@ -5,88 +5,86 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <string.h>
+#include <threads.h>
 
-void perror_test(void)
-{
-    #if 0
-    for(;;) {
-        printf("errno: %d\n", errno);
-        perror("perror test");
-    
-        if (errno == 133) {
-            break;
-        }
-        errno++;
-    }
-    errno = 0;
-    #endif
-}
+#define BUFFER_SIZE 5
 
 void std_out_test(void)
 {
     printf("print something or other\n");
     // fflush 的作用是强制将缓冲区内的数据立即写入
     fflush(stdout);
-    #if defined(FOPEN_MAX)
-        printf("FOPEN_MAX: %d\n", FOPEN_MAX);
-    #endif
-    #ifdef FILENAME_MAX
-        printf("FILENAME_MAX: %d\n", FILENAME_MAX);
-    #endif
+#if defined(FOPEN_MAX)
+    printf("FOPEN_MAX: %d\n", FOPEN_MAX);
+#endif
+#ifdef FILENAME_MAX
+    printf("FILENAME_MAX: %d\n", FILENAME_MAX);
+#endif
 }
 
-void file_write_test(void)
+FILE *open_file_with_check(const char *filename, const char *mode)
 {
-    FILE *fp = fopen("write_test.txt", "wr");
-    if (fp == NULL) {
-        perror("fopen");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(fp, "This is testing for fprintf...\n");
-    fputs("This is testing for fputs...\n", fp);
-    fputc(EOF, fp);
-    fputc('\n', fp);
-    fputc('\n', fp);
-    fclose(fp);
-
-}
-
-void file_flush_test(void)
-{
-    FILE *fp = fopen("flush_test.txt", "a+");
-    if (fp == NULL) {
-        perror("fopen");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(fp, "This is testing for fprintf...\n");
-    fflush(fp);
-    fseek(fp, 0, SEEK_SET);
-    char c;
-    while((c = getc(fp)) != EOF) {
-        putchar(c);
-    }
-    if (fclose(fp) != 0)
+    FILE *fp = fopen(filename, mode);
+    if (fp == NULL)
     {
-        perror("flush_test.txt");
+        perror(filename);
         exit(EXIT_FAILURE);
     }
+    return fp;
 }
 
-void file_read_test(void)
+FILE *close_file_with_check(FILE *fp)
 {
-    FILE *fp = fopen("flush_test.txt", "r");
-    if (fp == NULL) {
-        perror("flush_test.txt");
-        exit(EXIT_FAILURE);
-    }
-    char c;
-    while((c = getc(fp)) != EOF) {
-        putchar(c);
-    }
     if (fclose(fp) != 0)
     {
         perror("fclose");
         exit(EXIT_FAILURE);
+    }
+    return NULL;
+}
+
+
+void file_read_test(void)
+{
+    FILE *fp = open_file_with_check("write_test.txt", "wr");
+    char *line = alloca(BUFFER_SIZE);
+    int count = 0;
+    int total_str_len = 0;
+    while ((line = fgets(line, BUFFER_SIZE, fp)) != NULL)
+    {
+        count++;
+        total_str_len += strlen(line);
+        printf("%s", line);
+    }
+    printf("count: %d\n", count);
+    printf("total_str_len: %d\n", total_str_len);
+
+    close_file_with_check(fp);
+}
+
+void gets_test(void)
+{
+    int count = 0;
+    char *line = alloca(BUFFER_SIZE);
+    while ((line = fgets(line, BUFFER_SIZE, stdin)) != NULL && line[0] != EOF)
+    {
+        printf("%s", line);
+        count++;
+        printf("std read count: %d\n", count);
+    }
+}
+
+void scanf_test(void)
+{
+    int count = 0;
+    char *line = alloca(BUFFER_SIZE);
+    while (scanf("%s", line) != EOF)
+    {
+        printf("%s\n", line);
+        count++;
+        printf("std read count: %d\n", count);
+        thrd_sleep(&(struct timespec){.tv_sec = 4}, NULL);
     }
 }
 
@@ -94,11 +92,10 @@ void file_read_test(void)
 void chapt_15_demo_run(void)
 {
     print_dividing_line("chapt_15_demo_run");
-    perror_test();
-    std_out_test();
-    file_write_test();
-    file_flush_test();
-    file_read_test();
+    // std_out_test();
+    // file_read_test();
+    // gets_test();
+    scanf_test();
     print_dividing_line("");
 }
 #endif
