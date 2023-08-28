@@ -7,21 +7,9 @@
 #include <errno.h>
 #include <string.h>
 #include <threads.h>
+#include <pthread.h>
 
-#define BUFFER_SIZE 5
-
-void std_out_test(void)
-{
-    printf("print something or other\n");
-    // fflush 的作用是强制将缓冲区内的数据立即写入
-    fflush(stdout);
-#if defined(FOPEN_MAX)
-    printf("FOPEN_MAX: %d\n", FOPEN_MAX);
-#endif
-#ifdef FILENAME_MAX
-    printf("FILENAME_MAX: %d\n", FILENAME_MAX);
-#endif
-}
+#define BUFFER_SIZE 128
 
 void open_file_with_check(FILE **fp, const char *filename, const char *mode)
 {
@@ -35,6 +23,9 @@ void open_file_with_check(FILE **fp, const char *filename, const char *mode)
 
 void close_file_with_check(FILE **fp)
 {
+    if (NULL == fp || NULL == *fp) {
+        return;
+    }
     if (fclose(*fp) != 0)
     {
         perror("fclose");
@@ -43,107 +34,77 @@ void close_file_with_check(FILE **fp)
     *fp = NULL;
 }
 
-
-void file_read_test(void)
+void test(void)
 {
     FILE *fp;
-    open_file_with_check(&fp, "write_test.txt", "wr");
-    char *line = alloca(BUFFER_SIZE * sizeof(char));
-    int count = 0;
-    int total_str_len = 0;
-    while ((line = fgets(line, BUFFER_SIZE, fp)) != NULL)
+    open_file_with_check(&fp, "test.txt", "r+");
+    char *buffer = malloc(BUFFER_SIZE * sizeof(char));
+    size_t line = 0;
+    for (;;)
     {
-        count++;
-        total_str_len += strlen(line);
-        printf("%s", line);
+        fprintf(fp, "current line is %ld\n", ++line);
+        fflush(fp);
+        thrd_sleep(&(struct timespec){.tv_sec = 1}, NULL);
+        if (line >= 6)
+        {
+            break;
+        }
     }
-    printf("count: %d\n", count);
-    printf("total_str_len: %d\n", total_str_len);
-
     close_file_with_check(&fp);
 }
-
-void gets_test(void)
-{
-    int count = 0;
-    char *line = alloca(BUFFER_SIZE);
-    while ((line = fgets(line, BUFFER_SIZE, stdin)) != NULL)
-    {
-        printf("%s", line);
-    }
-}
-
-void  scanf_test(void)
-{
-    FILE *fp;
-    open_file_with_check(&fp, "write_test.txt", "wr");
-
-
-    close_file_with_check(&fp);
-}
-
-typedef struct BitWRDemo {
-    long a;
-    int b;
-    int c;
-    // char d[10];
-
-} BitWRDemo;
-
-
-void bit_write_test(void)
-{
-    FILE *fp;
-    size_t size = sizeof(BitWRDemo);
-    size_t count = 2;
-
-    BitWRDemo bit_demo_array[2] = {{-1, 0x11111111, 0xffffffff}, {0xF123456789ABCDEF, 0x11111111, __INT32_MAX__}};
-    open_file_with_check(&fp, "write_test.txt", "wr");
-    size_t total = fwrite(bit_demo_array, size, count, fp);
-    printf("total: %ld\n", total);
-    close_file_with_check(&fp);
-
-    BitWRDemo bit_demo_array2[2];
-    open_file_with_check(&fp, "write_test.txt", "r");
-    total = fread(bit_demo_array2, size, count, fp);
-    close_file_with_check(&fp);
-
-    for (size_t i = 0; i < count; i++) {
-        printf("a: %16lX \tb: %8X \tc: %8X\n", bit_demo_array2[i].a, bit_demo_array2[i].b, bit_demo_array2[i].c);
-    }
-}
-
-void random_write_test(void)
+void read(void)
 {
     FILE *fp;
     open_file_with_check(&fp, "test.txt", "r");
-    char *buff = malloc(sizeof(char) * BUFFER_SIZE);
-    size_t count = 0;
-    // while (fscanf(fp, "%[^\n]", buff) != EOF) {
-    //     printf("%s\tcount: %ld\n", buff, count++);
-    // }
-    int a;
-    int b;
-    int c;
-    sscanf("10, 20, 30", "%d, %d, %d", &a, &b, &c);
-    printf("a: %d\n", a);
-    printf("b: %d\n", b);
-    printf("c: %d\n", c);
-
     
+    // char *buffer = malloc(BUFFER_SIZE * sizeof(char));
+    // while (fgets(buffer, BUFFER_SIZE, fp) != NULL)
+    // {
+    //     printf("%s", buffer);
+    // }
+
+    char c;
+    size_t count = 0;
+    int skip = 1;
+    while ((c = fgetc(fp)) != EOF)
+    {
+        if (c == '0' && skip != 0)
+        {
+            ungetc(c, fp);
+            fseek(fp, 1, SEEK_CUR);
+            skip = 0;
+            // continue;
+        }
+        printf("%c", c);
+        fflush(stdout);
+        count++;
+    }
+
+    printf("\ncount = %ld\n", count);
     close_file_with_check(&fp);
 }
+
 
 #ifdef _TEST_
 void chapt_15_demo_run(void)
 {
     print_dividing_line("chapt_15_demo_run");
-    // std_out_test();
-    // file_read_test();
-    // gets_test();
-    // scanf_test();
-    // bit_write_test();
-    random_write_test();
+    // test();
+    read();
     print_dividing_line("");
 }
 #endif
+
+typedef struct {
+    char * name;
+    int age;
+    char * address;
+    char * phone;
+    char * email;
+} StudentInfo;
+
+int read_random_record(FILE *f, size_t rec_number, StudentInfo * buffer)
+{
+    fseek(f, rec_number * sizeof(StudentInfo), SEEK_SET);
+    return fread(buffer, sizeof(StudentInfo), 1, f);
+}

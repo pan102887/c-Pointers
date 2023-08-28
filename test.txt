@@ -1,5 +1,7 @@
-current line is: 1
-current line is: 2
-current line is: 3
-rewind line
- is: 4
+aaaaaaaaaaaaaaaaaaaaa0
+bbbbbbbbbbbbbbbbbbbbb0
+ccccccccccccccccccccc0
+ddddddddddddddddddddd0
+eeeeeeeeeeeeeeeeeeeee0
+fffffffffffffffffffff0
+ggggggggggggggggggggg0

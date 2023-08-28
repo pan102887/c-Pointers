@@ -2,9 +2,9 @@ cc := gcc
 project := c-demo
 
 object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o \
-	chapt_11_demo.o alloc.o chapt_12_demo.o chapt_13_demo.o my_data.o chapt_14_demo.o chapt_15_demo.o test.o
+	chapt_11_demo.o alloc.o chapt_12_demo.o chapt_13_demo.o my_data.o chapt_14_demo.o chapt_15_demo.o test.o b_tree.o
 common := 
-common_param := -m64 -D_TEST_
+common_param := -m64 -D_TEST_ -g
 
 
 c-demo: ${object}
@@ -60,6 +60,9 @@ global.o: global.c global.h ${common}
 
 my_data.o : my_data.c my_data.h ${common}
 	${cc} ${common_param} -c my_data.c -o my_data.o
+
+b_tree.o : b_tree.c b_tree.h ${common}
+	${cc} ${common_param} -c b_tree.c -o b_tree.o
 
 test.o: test.c test.h ${common}
 	${cc} ${common_param} -c test.c -o test.o
