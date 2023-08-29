@@ -13,8 +13,24 @@ static inline void b_tree_node_print(b_tree_node *tree);
 extern b_tree *b_tree_new()
 {
     b_tree *tree = malloc(sizeof(b_tree));
+    if (NULL == tree)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    tree->size = 0;
     tree->root = NULL;
     return tree;
+}
+
+
+extern size_t b_tree_size(b_tree *tree)
+{
+    if (NULL == tree)
+    {
+        return 0;
+    }
+    return tree->size;
 }
 
 extern void b_tree_insert(b_tree *tree, int key, void *value)
@@ -23,6 +39,7 @@ extern void b_tree_insert(b_tree *tree, int key, void *value)
     {
         return;
     }
+    tree->size++;
     b_tree_node_insert(&(tree->root), key, value);
 }
 
@@ -33,9 +50,9 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
         return;
     }
     b_tree_node **insert_position = root;
-    while(*insert_position != NULL)
+    while (*insert_position != NULL)
     {
-        if (key < (*insert_position)-> key)
+        if (key < (*insert_position)->key)
         {
             insert_position = &((*insert_position)->left);
         }
@@ -54,6 +71,11 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
 static inline b_tree_node *alloc_b_tree_node(int key, void *value)
 {
     b_tree_node *node = malloc(sizeof(b_tree_node));
+    if (NULL == node)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
     node->key = key;
     node->value = value;
     node->left = NULL;
@@ -61,13 +83,13 @@ static inline b_tree_node *alloc_b_tree_node(int key, void *value)
     return node;
 }
 
-
 extern void b_tree_delete(b_tree *tree, int key)
 {
     if (NULL == tree)
     {
         return;
     }
+    tree->size--;
     b_tree_node_delete(&(tree->root), key);
 }
 static inline void b_tree_node_delete(b_tree_node **root, int key)
@@ -125,13 +147,14 @@ static inline void b_tree_node_free(b_tree_node **node)
     }
     else
     {
-        b_tree_node **successor = &((*node)->right);
-        while ((*successor)->left != NULL)
+        b_tree_node **new_subtree_root = &((*node)->right);
+        while ((*new_subtree_root)->left != NULL)
         {
-            successor = &((*successor)->left);
+            new_subtree_root = &((*new_subtree_root)->left);
         }
-        (*node)->key = (*successor)->key;
-        b_tree_node_free(successor);
+        (*node)->key = (*new_subtree_root)->key;
+        (*node)->value = (*new_subtree_root)->value;
+        b_tree_node_free(new_subtree_root);
     }
 }
 
@@ -180,7 +203,6 @@ static inline void b_tree_node_print(b_tree_node *tree)
     b_tree_node_print(tree->right);
 }
 
-
 extern void b_tree_free(b_tree *tree)
 {
     if (NULL == tree)
@@ -202,48 +224,84 @@ static inline void b_tree_subtree_free(b_tree_node **root)
     *root = NULL;
 }
 
-
 #ifdef _TEST_
+static inline void node_display(b_tree_node *node);
 static inline void search_and_print(b_tree *tree, int key)
 {
     b_tree_node *node = b_tree_search(tree, key);
+    node_display(node);
+}
+
+static inline void node_display(b_tree_node *node)
+{
     if (NULL != node)
     {
         printf("find node with key %d and value is: \"%s\"\n", node->key, (char *)node->value);
     }
     else
     {
-        printf("can not find node\n");
+        printf("invalid pointer of node\n");
     }
+}
+
+static inline void test_one(void)
+{
+    b_tree *tree = b_tree_new();
+    // root
+    b_tree_insert(tree, 5, "5");
+
+    // left
+    b_tree_insert(tree, 2, "2");
+    b_tree_insert(tree, 3, "3");
+    b_tree_insert(tree, 1, "1");
+
+    // right
+    b_tree_insert(tree, 8, "8");
+    b_tree_insert(tree, 6, "6");
+    b_tree_insert(tree, 7, "7");
+    b_tree_insert(tree, 9, "9");
+
+    node_display(tree->root);
+    b_tree_delete(tree, tree->root->key);
+    node_display(tree->root);
+}
+
+static inline void test_two(void)
+{
+    b_tree *tree = b_tree_new();
+    b_tree_insert(tree, 5, "5");
+    b_tree_insert(tree, 3, "3");
+    b_tree_insert(tree, 6, "6");
+    b_tree_insert(tree, 7, "7");
+    b_tree_insert(tree, 2, "2");
+    b_tree_insert(tree, 4, "4");
+    b_tree_insert(tree, 8, "8");
+    b_tree_insert(tree, 10, "10");
+    b_tree_insert(tree, 11, "11");
+    b_tree_insert(tree, 1, "1");
+    b_tree_insert(tree, 9, "9");
+
+    search_and_print(tree, 2);
+    b_tree_insert(tree, 2, "2 after change");
+    search_and_print(tree, 2);
+
+    search_and_print(tree, 12);
+    b_tree_print(tree);
+    printf("tree size: %ld\n", b_tree_size(tree));
+
+    b_tree_delete(tree, 5);
+    search_and_print(tree, 6);
+    search_and_print(tree, 7);
+    b_tree_print(tree);
+    printf("tree size: %ld\n", b_tree_size(tree));
+
+    b_tree_free(tree);
+    b_tree_print(tree);
 }
 
 void b_tree_test()
 {
-    b_tree *tree = b_tree_new();
-    b_tree_insert(tree, 5, "demo");
-    b_tree_insert(tree, 3, "sdf");
-    b_tree_insert(tree, 7, "test");
-    b_tree_insert(tree, 2, "what the fuck");
-    b_tree_insert(tree, 4, "amazing");
-    b_tree_insert(tree, 6, "1");
-    b_tree_insert(tree, 8, "2");
-    b_tree_insert(tree, 10, "3");
-    b_tree_insert(tree, 11, "4");
-    b_tree_insert(tree, 1, "5");
-    b_tree_insert(tree, 9, "6");
-
-    search_and_print(tree, 2);
-    b_tree_insert(tree, 2, "after change");
-    search_and_print(tree, 2);
-
-
-    search_and_print(tree, 12);
-    b_tree_print(tree);
-
-    b_tree_delete(tree, 5);
-    b_tree_print(tree);
-
-    b_tree_free(tree);
-    b_tree_print(tree);
+    test_one();
+    test_two();
 }
 #endif
