@@ -15,6 +15,7 @@
 #include "chapt_13_demo.h"
 #include "chapt_14_demo.h"
 #include "chapt_15_demo.h"
+#include "b_tree.h"
 #include "kmp.h"
 
 #include <stdio.h>
@@ -33,9 +34,10 @@ static const Runable runable_list[] = {
     {chapt_13_demo_run, "chapt_13_demo_run"},
     {chapt_14_demo_run, "chapt_14_demo_run"},
     {chapt_15_demo_run, "chapt_15_demo_run"},
+    {b_tree_test, "b_tree_test"}
 };
 
-static const size_t runable_list_size = 12;
+static const size_t runable_list_size = 13;
 
 static char const *const cmds[] = {
     "-n",
