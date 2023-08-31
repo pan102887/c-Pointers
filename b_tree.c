@@ -28,6 +28,7 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value);
 static inline void b_tree_subtree_free(b_tree_node **root);
 static inline void b_tree_node_delete(b_tree_node **root, int key);
 static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack);
+static inline void node_free(b_tree_node **node);
 static inline void b_tree_node_print(b_tree_node *tree);
 
 static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
@@ -40,6 +41,7 @@ static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
     *stack = (*stack)->next;
     b_tree_node *node = temp->node;
     free(temp);
+    return node;
 }
 
 static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node)
@@ -79,17 +81,21 @@ static inline void node_stack_free(b_tree_node_stack **stack)
 static inline void node_height_adjust(b_tree_node_stack **stack)
 {
     b_tree_node *currnt = NULL;
-    while((currnt = node_stack_pop(stack)) != NULL)
+    while ((currnt = node_stack_pop(stack)) != NULL)
     {
         size_t left_height = b_tree_node_height(currnt->left);
         size_t right_height = b_tree_node_height(currnt->right);
-        currnt->height = MAX(left_height, right_height) + 1;
+        if (left_height != right_height)
+        {
+            currnt->height = MAX(left_height, right_height) + 1;
+        }
     }
 }
 
 static inline size_t b_tree_node_height(b_tree_node *node)
 {
-    if (NULL == node){
+    if (NULL == node)
+    {
         return 0;
     }
     return node->height;
@@ -231,6 +237,7 @@ static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stac
     }
     else
     {
+        node_stack_push(stack, *node);
         b_tree_node **new_subtree_root = &((*node)->right);
         while ((*new_subtree_root)->left != NULL)
         {
@@ -310,81 +317,74 @@ static inline void b_tree_subtree_free(b_tree_node **root)
 }
 
 #ifdef _TEST_
-static inline void node_display(b_tree_node *node);
-static inline void search_and_print(b_tree *tree, int key)
+static inline void stack_test(void)
 {
-    b_tree_node *node = b_tree_search(tree, key);
-    node_display(node);
+    b_tree_node_stack *stack = NULL;
+
+    node_stack_push(&stack, alloc_b_tree_node(1, "1"));
+    node_stack_push(&stack, alloc_b_tree_node(2, "2"));
+    node_stack_push(&stack, alloc_b_tree_node(3, "3"));
+    node_stack_push(&stack, alloc_b_tree_node(4, "4"));
+    node_stack_push(&stack, alloc_b_tree_node(5, "5"));
+
+    b_tree_node *node = NULL;
+    while ((node = node_stack_pop(&stack)) != NULL)
+    {
+        printf("%d ", node->key);
+        free(node);
+    }
+    printf("\n");
 }
 
-static inline void node_display(b_tree_node *node)
-{
-    if (NULL != node)
-    {
-        printf("find node with key %d and value is: \"%s\"\n", node->key, (char *)node->value);
-    }
-    else
-    {
-        printf("invalid pointer of node\n");
-    }
-}
-
-static inline void test_one(void)
+static inline void tree_height_test(void)
 {
     b_tree *tree = b_tree_new();
-    // root
-    b_tree_insert(tree, 5, "5");
 
-    // left
-    b_tree_insert(tree, 2, "2");
-    b_tree_insert(tree, 3, "3");
     b_tree_insert(tree, 1, "1");
-
-    // right
-    b_tree_insert(tree, 8, "8");
-    b_tree_insert(tree, 6, "6");
-    b_tree_insert(tree, 7, "7");
-    b_tree_insert(tree, 9, "9");
-
-    node_display(tree->root);
-    b_tree_delete(tree, tree->root->key);
-    node_display(tree->root);
-}
-
-static inline void test_two(void)
-{
-    b_tree *tree = b_tree_new();
-    b_tree_insert(tree, 5, "5");
-    b_tree_insert(tree, 3, "3");
-    b_tree_insert(tree, 6, "6");
-    b_tree_insert(tree, 7, "7");
     b_tree_insert(tree, 2, "2");
+    b_tree_insert(tree, 3, "3");
     b_tree_insert(tree, 4, "4");
-    b_tree_insert(tree, 8, "8");
-    b_tree_insert(tree, 10, "10");
-    b_tree_insert(tree, 11, "11");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
+
+    b_tree_delete(tree, 3);
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
+    b_tree_free(tree);
+}
+
+static inline void tree_height_test2(void)
+{
+    b_tree *tree = b_tree_new();
+    b_tree_insert(tree, 5, "5");
+    printf("insert root 5");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
+
+    b_tree_insert(tree, 2, "2");
     b_tree_insert(tree, 1, "1");
+    b_tree_insert(tree, 3, "3");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
+
+    b_tree_insert(tree, 8, "8");
+    b_tree_insert(tree, 6, "6");
+    printf("insert 6 ");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
+    b_tree_insert(tree, 7, "7");
+    printf("insert 7 ");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
     b_tree_insert(tree, 9, "9");
+    printf("insert 9 ");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
 
-    search_and_print(tree, 2);
-    b_tree_insert(tree, 2, "2 after change");
-    search_and_print(tree, 2);
-
-    search_and_print(tree, 12);
-    b_tree_print(tree);
-
-    b_tree_delete(tree, 5);
-    search_and_print(tree, 6);
-    search_and_print(tree, 7);
-    b_tree_print(tree);
+    b_tree_delete(tree, 6);
+    printf("delete 6 ");
+    printf("root height: %ld\n", b_tree_node_height(tree->root));
 
     b_tree_free(tree);
-    b_tree_print(tree);
 }
 
 void b_tree_test()
 {
-    test_one();
-    test_two();
+    stack_test();
+    tree_height_test();
+    tree_height_test2();
 }
 #endif
