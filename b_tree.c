@@ -85,10 +85,7 @@ static inline void node_height_adjust(b_tree_node_stack **stack)
     {
         size_t left_height = b_tree_node_height(currnt->left);
         size_t right_height = b_tree_node_height(currnt->right);
-        if (left_height != right_height)
-        {
-            currnt->height = MAX(left_height, right_height) + 1;
-        }
+        currnt->height = MAX(left_height, right_height) + 1;
     }
 }
 
@@ -354,29 +351,16 @@ static inline void tree_height_test(void)
 static inline void tree_height_test2(void)
 {
     b_tree *tree = b_tree_new();
-    b_tree_insert(tree, 5, "5");
-    printf("insert root 5");
-    printf("root height: %ld\n", b_tree_node_height(tree->root));
-
     b_tree_insert(tree, 2, "2");
     b_tree_insert(tree, 1, "1");
     b_tree_insert(tree, 3, "3");
+    b_tree_insert(tree, 4, "4");
+
+    b_tree_print(tree);
     printf("root height: %ld\n", b_tree_node_height(tree->root));
 
-    b_tree_insert(tree, 8, "8");
-    b_tree_insert(tree, 6, "6");
-    printf("insert 6 ");
-    printf("root height: %ld\n", b_tree_node_height(tree->root));
-    b_tree_insert(tree, 7, "7");
-    printf("insert 7 ");
-    printf("root height: %ld\n", b_tree_node_height(tree->root));
-    b_tree_insert(tree, 9, "9");
-    printf("insert 9 ");
-    printf("root height: %ld\n", b_tree_node_height(tree->root));
-
-    b_tree_delete(tree, 6);
-    printf("delete 6 ");
-    printf("root height: %ld\n", b_tree_node_height(tree->root));
+    b_tree_delete(tree, 2);
+    printf("delete 2 root height: %ld\n", b_tree_node_height(tree->root));
 
     b_tree_free(tree);
 }
