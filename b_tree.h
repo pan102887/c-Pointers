@@ -6,7 +6,6 @@
 typedef struct _b_tree_node
 {
     int key;
-    size_t height;
     void *value;
     struct _b_tree_node *left;
     struct _b_tree_node *right;

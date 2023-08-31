@@ -20,8 +20,6 @@ static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack);
 static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node);
 static inline void node_stack_free(b_tree_node_stack **stack);
 
-static inline void b_tree_node_height_adjust(b_tree_node_stack *stack);
-
 static inline size_t b_tree_node_height(b_tree_node *node);
 static inline b_tree_node *alloc_b_tree_node(int key, void *value);
 static inline void b_tree_node_insert(b_tree_node **root, int key, void *value);
@@ -76,29 +74,6 @@ static inline void node_stack_free(b_tree_node_stack **stack)
     *stack = NULL;
 }
 
-static inline void b_tree_node_height_adjust(b_tree_node_stack *stack)
-{
-    b_tree_node *current;
-    while ((current = node_stack_pop(&stack)) != NULL)
-    {
-        size_t left_height = b_tree_node_height(current->left);
-        size_t right_height = b_tree_node_height(current->right);
-        if (left_height != right_height)
-        {
-            current->height = MAX(left_height, right_height) + 1;
-        }
-    }
-    node_stack_free(&stack);
-}
-
-static inline size_t b_tree_node_height(b_tree_node *node)
-{
-    if (NULL == node)
-    {
-        return 0;
-    }
-    return node->height;
-}
 
 extern b_tree *b_tree_new()
 {
@@ -128,11 +103,9 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
     {
         return;
     }
-    b_tree_node_stack *stack = NULL;
     b_tree_node **insert_position = root;
     while (*insert_position != NULL)
     {
-        b_tree_node *current = *insert_position;
         if (key < (*insert_position)->key)
         {
             insert_position = &((*insert_position)->left);
@@ -144,13 +117,10 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
         else
         {
             (*insert_position)->value = value;
-            node_stack_free(stack);
             return;
         }
-        node_stack_push(&stack, current);
     }
     *insert_position = alloc_b_tree_node(key, value);
-    b_tree_node_height_adjust(stack);
 }
 
 static inline b_tree_node *alloc_b_tree_node(int key, void *value)
@@ -163,7 +133,6 @@ static inline b_tree_node *alloc_b_tree_node(int key, void *value)
     }
     node->key = key;
     node->value = value;
-    node->height = 1;
     node->left = NULL;
     node->right = NULL;
     return node;
@@ -183,11 +152,9 @@ static inline void b_tree_node_delete(b_tree_node **root, int key)
     {
         return;
     }
-    b_tree_node_stack *stack = NULL;
     b_tree_node **delete_position = root;
     while (*delete_position != NULL)
     {
-        node_stack_push(&stack, *delete_position);
         if (key < (*delete_position)->key)
         {
             delete_position = &((*delete_position)->left);
@@ -375,12 +342,10 @@ static inline void test_two(void)
     search_and_print(tree, 12);
     b_tree_print(tree);
 
-
     b_tree_delete(tree, 5);
     search_and_print(tree, 6);
     search_and_print(tree, 7);
     b_tree_print(tree);
-
 
     b_tree_free(tree);
     b_tree_print(tree);
