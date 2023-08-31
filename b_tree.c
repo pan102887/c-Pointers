@@ -20,12 +20,14 @@ static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack);
 static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node);
 static inline void node_stack_free(b_tree_node_stack **stack);
 
+static inline void node_height_adjust(b_tree_node_stack **stack);
+
 static inline size_t b_tree_node_height(b_tree_node *node);
 static inline b_tree_node *alloc_b_tree_node(int key, void *value);
 static inline void b_tree_node_insert(b_tree_node **root, int key, void *value);
 static inline void b_tree_subtree_free(b_tree_node **root);
 static inline void b_tree_node_delete(b_tree_node **root, int key);
-static inline void b_tree_node_free(b_tree_node **node);
+static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack);
 static inline void b_tree_node_print(b_tree_node *tree);
 
 static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
@@ -74,6 +76,24 @@ static inline void node_stack_free(b_tree_node_stack **stack)
     *stack = NULL;
 }
 
+static inline void node_height_adjust(b_tree_node_stack **stack)
+{
+    b_tree_node *currnt = NULL;
+    while((currnt = node_stack_pop(stack)) != NULL)
+    {
+        size_t left_height = b_tree_node_height(currnt->left);
+        size_t right_height = b_tree_node_height(currnt->right);
+        currnt->height = MAX(left_height, right_height) + 1;
+    }
+}
+
+static inline size_t b_tree_node_height(b_tree_node *node)
+{
+    if (NULL == node){
+        return 0;
+    }
+    return node->height;
+}
 
 extern b_tree *b_tree_new()
 {
@@ -103,9 +123,11 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
     {
         return;
     }
+    b_tree_node_stack *stack = NULL;
     b_tree_node **insert_position = root;
     while (*insert_position != NULL)
     {
+        node_stack_push(&stack, *insert_position);
         if (key < (*insert_position)->key)
         {
             insert_position = &((*insert_position)->left);
@@ -117,10 +139,12 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
         else
         {
             (*insert_position)->value = value;
+            node_stack_free(&stack);
             return;
         }
     }
     *insert_position = alloc_b_tree_node(key, value);
+    node_height_adjust(&stack);
 }
 
 static inline b_tree_node *alloc_b_tree_node(int key, void *value)
@@ -133,6 +157,7 @@ static inline b_tree_node *alloc_b_tree_node(int key, void *value)
     }
     node->key = key;
     node->value = value;
+    node->height = 1;
     node->left = NULL;
     node->right = NULL;
     return node;
@@ -152,9 +177,11 @@ static inline void b_tree_node_delete(b_tree_node **root, int key)
     {
         return;
     }
+    b_tree_node_stack *stack = NULL;
     b_tree_node **delete_position = root;
     while (*delete_position != NULL)
     {
+        b_tree_node *current = *delete_position;
         if (key < (*delete_position)->key)
         {
             delete_position = &((*delete_position)->left);
@@ -167,15 +194,18 @@ static inline void b_tree_node_delete(b_tree_node **root, int key)
         {
             break;
         }
+        node_stack_push(&stack, current);
     }
     if (NULL == *delete_position)
     {
+        node_stack_free(&stack);
         return;
     }
-    b_tree_node_free(delete_position);
+    b_tree_node_free(delete_position, &stack);
+    node_height_adjust(&stack);
 }
 
-static inline void b_tree_node_free(b_tree_node **node)
+static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack)
 {
     if (NULL == node || NULL == *node)
     {
@@ -204,11 +234,12 @@ static inline void b_tree_node_free(b_tree_node **node)
         b_tree_node **new_subtree_root = &((*node)->right);
         while ((*new_subtree_root)->left != NULL)
         {
+            node_stack_push(stack, *new_subtree_root);
             new_subtree_root = &((*new_subtree_root)->left);
         }
         (*node)->key = (*new_subtree_root)->key;
         (*node)->value = (*new_subtree_root)->value;
-        b_tree_node_free(new_subtree_root);
+        b_tree_node_free(new_subtree_root, stack);
     }
 }
 
