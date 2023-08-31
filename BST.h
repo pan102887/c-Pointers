@@ -3,9 +3,10 @@
 
 /**
  * @brief binary search tree node
- * 
+ *
  */
-typedef struct BSTNode {
+typedef struct BSTNode
+{
     void *data;
     struct BSTNode *left;
     struct BSTNode *right;
@@ -15,7 +16,15 @@ typedef struct BSTNode {
     int (*compare)(void *, void *);
     void (*print)(void *);
     void (*del)(void *);
-    
-}BSTNode;
+} BSTNode;
+
+typedef struct BST
+{
+    BSTNode *root;
+    int size;
+    int (*compare)(void *, void *);
+    void (*print)(void *);
+    void (*del)(void *);
+} BST;
 
 #endif

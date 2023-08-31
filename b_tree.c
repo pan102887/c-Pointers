@@ -3,12 +3,102 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+typedef struct b_tree_node_stack
+{
+    b_tree_node *node;
+    struct b_tree_node_stack *next;
+} b_tree_node_stack;
+typedef enum node_stack_push_result
+{
+    PUSH_SUCCESS,
+    PUSH_FAILURE
+} node_stack_push_result;
+
+static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack);
+static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node);
+static inline void node_stack_free(b_tree_node_stack **stack);
+
+static inline void b_tree_node_height_adjust(b_tree_node_stack *stack);
+
+static inline size_t b_tree_node_height(b_tree_node *node);
 static inline b_tree_node *alloc_b_tree_node(int key, void *value);
 static inline void b_tree_node_insert(b_tree_node **root, int key, void *value);
 static inline void b_tree_subtree_free(b_tree_node **root);
 static inline void b_tree_node_delete(b_tree_node **root, int key);
 static inline void b_tree_node_free(b_tree_node **node);
 static inline void b_tree_node_print(b_tree_node *tree);
+
+static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
+{
+    if (NULL == stack || NULL == *stack)
+    {
+        return NULL;
+    }
+    b_tree_node_stack *temp = *stack;
+    *stack = (*stack)->next;
+    b_tree_node *node = temp->node;
+    free(temp);
+}
+
+static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node)
+{
+    if (NULL == stack || NULL == node)
+    {
+        return PUSH_FAILURE;
+    }
+    b_tree_node_stack *new_node = malloc(sizeof(b_tree_node_stack));
+    if (NULL == new_node)
+    {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+    new_node->node = node;
+    new_node->next = *stack;
+    *stack = new_node;
+    return PUSH_SUCCESS;
+}
+
+static inline void node_stack_free(b_tree_node_stack **stack)
+{
+    if (NULL == stack || NULL == *stack)
+    {
+        return;
+    }
+    b_tree_node_stack *current = *stack;
+    while (current != NULL)
+    {
+        b_tree_node_stack *temp = current;
+        current = current->next;
+        free(temp);
+    }
+    *stack = NULL;
+}
+
+static inline void b_tree_node_height_adjust(b_tree_node_stack *stack)
+{
+    b_tree_node *current;
+    while ((current = node_stack_pop(&stack)) != NULL)
+    {
+        size_t left_height = b_tree_node_height(current->left);
+        size_t right_height = b_tree_node_height(current->right);
+        if (left_height != right_height)
+        {
+            current->height = MAX(left_height, right_height) + 1;
+        }
+    }
+    node_stack_free(&stack);
+}
+
+static inline size_t b_tree_node_height(b_tree_node *node)
+{
+    if (NULL == node)
+    {
+        return 0;
+    }
+    return node->height;
+}
 
 extern b_tree *b_tree_new()
 {
@@ -18,19 +108,8 @@ extern b_tree *b_tree_new()
         perror("malloc");
         exit(EXIT_FAILURE);
     }
-    tree->size = 0;
     tree->root = NULL;
     return tree;
-}
-
-
-extern size_t b_tree_size(b_tree *tree)
-{
-    if (NULL == tree)
-    {
-        return 0;
-    }
-    return tree->size;
 }
 
 extern void b_tree_insert(b_tree *tree, int key, void *value)
@@ -39,7 +118,7 @@ extern void b_tree_insert(b_tree *tree, int key, void *value)
     {
         return;
     }
-    tree->size++;
+
     b_tree_node_insert(&(tree->root), key, value);
 }
 
@@ -49,9 +128,11 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
     {
         return;
     }
+    b_tree_node_stack *stack = NULL;
     b_tree_node **insert_position = root;
     while (*insert_position != NULL)
     {
+        b_tree_node *current = *insert_position;
         if (key < (*insert_position)->key)
         {
             insert_position = &((*insert_position)->left);
@@ -63,11 +144,15 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
         else
         {
             (*insert_position)->value = value;
+            node_stack_free(stack);
             return;
         }
+        node_stack_push(&stack, current);
     }
     *insert_position = alloc_b_tree_node(key, value);
+    b_tree_node_height_adjust(stack);
 }
+
 static inline b_tree_node *alloc_b_tree_node(int key, void *value)
 {
     b_tree_node *node = malloc(sizeof(b_tree_node));
@@ -78,6 +163,7 @@ static inline b_tree_node *alloc_b_tree_node(int key, void *value)
     }
     node->key = key;
     node->value = value;
+    node->height = 1;
     node->left = NULL;
     node->right = NULL;
     return node;
@@ -89,7 +175,6 @@ extern void b_tree_delete(b_tree *tree, int key)
     {
         return;
     }
-    tree->size--;
     b_tree_node_delete(&(tree->root), key);
 }
 static inline void b_tree_node_delete(b_tree_node **root, int key)
@@ -98,9 +183,11 @@ static inline void b_tree_node_delete(b_tree_node **root, int key)
     {
         return;
     }
+    b_tree_node_stack *stack = NULL;
     b_tree_node **delete_position = root;
     while (*delete_position != NULL)
     {
+        node_stack_push(&stack, *delete_position);
         if (key < (*delete_position)->key)
         {
             delete_position = &((*delete_position)->left);
@@ -287,13 +374,13 @@ static inline void test_two(void)
 
     search_and_print(tree, 12);
     b_tree_print(tree);
-    printf("tree size: %ld\n", b_tree_size(tree));
+
 
     b_tree_delete(tree, 5);
     search_and_print(tree, 6);
     search_and_print(tree, 7);
     b_tree_print(tree);
-    printf("tree size: %ld\n", b_tree_size(tree));
+
 
     b_tree_free(tree);
     b_tree_print(tree);
