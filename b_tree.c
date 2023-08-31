@@ -351,16 +351,22 @@ static inline void tree_height_test(void)
 static inline void tree_height_test2(void)
 {
     b_tree *tree = b_tree_new();
+    b_tree_insert(tree, 5, "5");
+
     b_tree_insert(tree, 2, "2");
     b_tree_insert(tree, 1, "1");
     b_tree_insert(tree, 3, "3");
-    b_tree_insert(tree, 4, "4");
+
+    b_tree_insert(tree, 8, "8");
+    b_tree_insert(tree, 6, "6");
+    b_tree_insert(tree, 7, "7");
+    b_tree_insert(tree, 9, "9");
 
     b_tree_print(tree);
     printf("root height: %ld\n", b_tree_node_height(tree->root));
 
-    b_tree_delete(tree, 2);
-    printf("delete 2 root height: %ld\n", b_tree_node_height(tree->root));
+    b_tree_delete(tree, 6);
+    printf("delete 6 root height: %ld\n", b_tree_node_height(tree->root));
 
     b_tree_free(tree);
 }
