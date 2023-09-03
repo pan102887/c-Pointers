@@ -11,7 +11,7 @@
 
 #define BUFFER_SIZE 128
 
-void open_file_with_check(FILE **fp, const char *filename, const char *mode)
+static inline void open_file_with_check(FILE **fp, const char *filename, const char *mode)
 {
     *fp = fopen(filename, mode);
     if (*fp == NULL)
@@ -23,7 +23,8 @@ void open_file_with_check(FILE **fp, const char *filename, const char *mode)
 
 void close_file_with_check(FILE **fp)
 {
-    if (NULL == fp || NULL == *fp) {
+    if (NULL == fp || NULL == *fp)
+    {
         return;
     }
     if (fclose(*fp) != 0)
@@ -56,7 +57,7 @@ void read(void)
 {
     FILE *fp;
     open_file_with_check(&fp, "test.txt", "r");
-    
+
     // char *buffer = malloc(BUFFER_SIZE * sizeof(char));
     // while (fgets(buffer, BUFFER_SIZE, fp) != NULL)
     // {
@@ -84,9 +85,8 @@ void read(void)
     close_file_with_check(&fp);
 }
 
-
 #ifdef _TEST_
-void chapt_15_demo_run(void)
+extern void chapt_15_demo_run(void)
 {
     print_dividing_line("chapt_15_demo_run");
     // test();
@@ -94,17 +94,3 @@ void chapt_15_demo_run(void)
     print_dividing_line("");
 }
 #endif
-
-typedef struct {
-    char * name;
-    int age;
-    char * address;
-    char * phone;
-    char * email;
-} StudentInfo;
-
-int read_random_record(FILE *f, size_t rec_number, StudentInfo * buffer)
-{
-    fseek(f, rec_number * sizeof(StudentInfo), SEEK_SET);
-    return fread(buffer, sizeof(StudentInfo), 1, f);
-}

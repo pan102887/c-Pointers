@@ -4,6 +4,8 @@
 #define TRUE 1
 #define FALSE 0
 
+#define _static_inline_ static inline
+
 void print_dividing_line(const char *str);
 void multi_dividing_line(int n_str, const char *str, ...);
 

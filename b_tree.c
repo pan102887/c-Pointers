@@ -1,5 +1,7 @@
 #include "b_tree.h"
 
+#include "m_def.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -16,22 +18,22 @@ typedef enum node_stack_push_result
     PUSH_FAILURE
 } node_stack_push_result;
 
-static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack);
-static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node);
-static inline void node_stack_free(b_tree_node_stack **stack);
+_static_inline_ b_tree_node *node_stack_pop(b_tree_node_stack **stack);
+_static_inline_ node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node);
+_static_inline_ void node_stack_free(b_tree_node_stack **stack);
 
-static inline void node_height_adjust(b_tree_node_stack **stack);
+_static_inline_ void node_height_adjust(b_tree_node_stack **stack);
 
-static inline size_t b_tree_node_height(b_tree_node *node);
-static inline b_tree_node *alloc_b_tree_node(int key, void *value);
-static inline void b_tree_node_insert(b_tree_node **root, int key, void *value);
-static inline void b_tree_subtree_free(b_tree_node **root);
-static inline void b_tree_node_delete(b_tree_node **root, int key);
-static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack);
-static inline void node_free(b_tree_node **node);
-static inline void b_tree_node_print(b_tree_node *tree);
+_static_inline_ size_t b_tree_node_height(b_tree_node *node);
+_static_inline_ b_tree_node *alloc_b_tree_node(int key, void *value);
+_static_inline_ void b_tree_node_insert(b_tree_node **root, int key, void *value);
+_static_inline_ void b_tree_subtree_free(b_tree_node **root);
+_static_inline_ void b_tree_node_delete(b_tree_node **root, int key);
+_static_inline_ void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack);
+_static_inline_ void node_free(b_tree_node **node);
+_static_inline_ void b_tree_node_print(b_tree_node *tree);
 
-static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
+_static_inline_ b_tree_node *node_stack_pop(b_tree_node_stack **stack)
 {
     if (NULL == stack || NULL == *stack)
     {
@@ -44,7 +46,7 @@ static inline b_tree_node *node_stack_pop(b_tree_node_stack **stack)
     return node;
 }
 
-static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node)
+_static_inline_ node_stack_push_result node_stack_push(b_tree_node_stack **stack, b_tree_node *node)
 {
     if (NULL == stack || NULL == node)
     {
@@ -62,7 +64,7 @@ static inline node_stack_push_result node_stack_push(b_tree_node_stack **stack, 
     return PUSH_SUCCESS;
 }
 
-static inline void node_stack_free(b_tree_node_stack **stack)
+_static_inline_ void node_stack_free(b_tree_node_stack **stack)
 {
     if (NULL == stack || NULL == *stack)
     {
@@ -78,7 +80,7 @@ static inline void node_stack_free(b_tree_node_stack **stack)
     *stack = NULL;
 }
 
-static inline void node_height_adjust(b_tree_node_stack **stack)
+_static_inline_ void node_height_adjust(b_tree_node_stack **stack)
 {
     b_tree_node *currnt = NULL;
     while ((currnt = node_stack_pop(stack)) != NULL)
@@ -89,7 +91,7 @@ static inline void node_height_adjust(b_tree_node_stack **stack)
     }
 }
 
-static inline size_t b_tree_node_height(b_tree_node *node)
+_static_inline_ size_t b_tree_node_height(b_tree_node *node)
 {
     if (NULL == node)
     {
@@ -120,7 +122,7 @@ extern void b_tree_insert(b_tree *tree, int key, void *value)
     b_tree_node_insert(&(tree->root), key, value);
 }
 
-static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
+_static_inline_ void b_tree_node_insert(b_tree_node **root, int key, void *value)
 {
     if (NULL == root)
     {
@@ -150,7 +152,7 @@ static inline void b_tree_node_insert(b_tree_node **root, int key, void *value)
     node_height_adjust(&stack);
 }
 
-static inline b_tree_node *alloc_b_tree_node(int key, void *value)
+_static_inline_ b_tree_node *alloc_b_tree_node(int key, void *value)
 {
     b_tree_node *node = malloc(sizeof(b_tree_node));
     if (NULL == node)
@@ -174,7 +176,7 @@ extern void b_tree_delete(b_tree *tree, int key)
     }
     b_tree_node_delete(&(tree->root), key);
 }
-static inline void b_tree_node_delete(b_tree_node **root, int key)
+_static_inline_ void b_tree_node_delete(b_tree_node **root, int key)
 {
     if (NULL == root || NULL == *root)
     {
@@ -208,7 +210,7 @@ static inline void b_tree_node_delete(b_tree_node **root, int key)
     node_height_adjust(&stack);
 }
 
-static inline void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack)
+_static_inline_ void b_tree_node_free(b_tree_node **node, b_tree_node_stack **stack)
 {
     if (NULL == node || NULL == *node)
     {
@@ -281,7 +283,7 @@ extern void b_tree_print(b_tree *tree)
     b_tree_node_print(tree->root);
     printf("\n");
 }
-static inline void b_tree_node_print(b_tree_node *tree)
+_static_inline_ void b_tree_node_print(b_tree_node *tree)
 {
     if (NULL == tree)
     {
@@ -301,7 +303,7 @@ extern void b_tree_free(b_tree *tree)
     b_tree_subtree_free(&(tree->root));
 }
 
-static inline void b_tree_subtree_free(b_tree_node **root)
+_static_inline_ void b_tree_subtree_free(b_tree_node **root)
 {
     if (NULL == root || NULL == *root)
     {
@@ -314,7 +316,7 @@ static inline void b_tree_subtree_free(b_tree_node **root)
 }
 
 #ifdef _TEST_
-static inline void stack_test(void)
+_static_inline_ void stack_test(void)
 {
     b_tree_node_stack *stack = NULL;
 
@@ -333,7 +335,7 @@ static inline void stack_test(void)
     printf("\n");
 }
 
-static inline void tree_height_test(void)
+_static_inline_ void tree_height_test(void)
 {
     b_tree *tree = b_tree_new();
 
@@ -348,7 +350,7 @@ static inline void tree_height_test(void)
     b_tree_free(tree);
 }
 
-static inline void tree_height_test2(void)
+_static_inline_ void tree_height_test2(void)
 {
     b_tree *tree = b_tree_new();
     b_tree_insert(tree, 5, "5");
