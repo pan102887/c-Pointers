@@ -85,12 +85,21 @@ void read(void)
     close_file_with_check(&fp);
 }
 
+#include <signal.h>
+void signal_print(int sig)
+{
+    printf("signal %d\n", sig);
+    fflush(stdout);
+}
+
 #ifdef _TEST_
 extern void chapt_15_demo_run(void)
 {
     print_dividing_line("chapt_15_demo_run");
     // test();
     read();
+    signal(SIGINT, signal_print);
+    printf("press ctrl+c to exit\n");
     print_dividing_line("");
 }
 #endif
