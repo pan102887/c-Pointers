@@ -8,7 +8,7 @@
 
 
 
-int sll_insert(register Node **linkp, register Node *new_node, int (*compare)(void *, void *))
+bool sll_insert(register Node **linkp, register Node *new_node, int (*compare)(void *, void *))
 {
     register Node *current;
 
@@ -19,10 +19,10 @@ int sll_insert(register Node **linkp, register Node *new_node, int (*compare)(vo
 
     new_node->next = current;
     *linkp = new_node;
-    return TRUE;
+    return true;
 }
 
-int sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *, void *), void *(*cpy)(void *))
+bool sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *, void *), void *(*cpy)(void *))
 {
     register Node *current;
     register Node *new_node;
@@ -37,6 +37,6 @@ int sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *, voi
     new_node->next = current;
 
     *linkp = new_node;
-    return TRUE;
+    return true;
 }
 

@@ -8,7 +8,7 @@ common_param := -m64 -D_TEST_ -g
 
 
 c-demo: ${object}
-	${cc} ${common_param} -o ${project} ${object}
+	${cc} ${common_param} -o ${project} ${object} -lm
 
 main.o:
 	${cc} ${common_param} -c main.c -o main.o ${common}
@@ -53,7 +53,7 @@ chapt_15_demo.o: chapt_15_demo.c chapt_15_demo.h ${common}
 	${cc} ${common_param} -c chapt_15_demo.c -o chapt_15_demo.o
 
 chapt_16_demo.o: chapt_16_demo.c chapt_16_demo.h ${common}
-	${cc} ${common_param} -c chapt_16_demo.c -o chapt_16_demo.o
+	${cc} ${common_param} -c chapt_16_demo.c -o chapt_16_demo.o -lm
 
 kmp.o: kmp.c kmp.h ${common}
 	${cc} ${common_param} -c kmp.c -o kmp.o

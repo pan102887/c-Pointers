@@ -1,6 +1,7 @@
 #ifndef _LINKED_LIST_H_
 #define _LINKED_LIST_H_
 #include "my_data.h"
+#include <stdbool.h>
 
 /**
  * @brief 一个简单的链表
@@ -15,7 +16,7 @@ typedef struct Node
     struct Node *next;
 } Node;
 
-int sll_insert(register Node **linkp, Node *new_node, int (*compare)(void *data1, void *data2));
-int sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *data1, void *data2), void *(*cpy)(void *data));
+bool sll_insert(register Node **linkp, Node *new_node, int (*compare)(void *data1, void *data2));
+bool sll_insert_cpy(register Node **linkp, void *data, int (*compare)(void *data1, void *data2), void *(*cpy)(void *data));
 
 #endif

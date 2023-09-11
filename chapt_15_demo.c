@@ -84,6 +84,17 @@ void read(void)
     printf("\ncount = %ld\n", count);
     close_file_with_check(&fp);
 }
+static inline void stream_buffer_mode_test(void)
+{
+    FILE *fp;
+    open_file_with_check(&fp, "test.txt", "rw+");
+    char *buffer = malloc(BUFSIZ * sizeof(char));
+    setvbuf(fp, buffer, _IOLBF, BUFSIZ);
+
+
+
+    close_file_with_check(&fp);
+}
 
 #include <signal.h>
 void signal_print(int sig)
