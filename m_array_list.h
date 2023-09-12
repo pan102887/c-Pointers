@@ -25,6 +25,7 @@ extern void m_array_list_and_data_free(m_array_list *list, void (*free_element)(
 extern void* array_list_get(m_array_list* list, size_t index);
 extern void array_list_set(m_array_list* list, size_t index, void* element);
 extern bool array_list_add(m_array_list* list, void* element);
+extern bool array_list_remove_by_index(m_array_list* list, size_t index);
 
 #if defined(_TEST_)
 extern void array_list_test(void);

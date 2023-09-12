@@ -11,6 +11,7 @@ static inline void ensure_capacity_internal(m_array_list* list ,size_t min_capac
 static inline void ensure_explicit_capacity(m_array_list* list ,size_t min_capacity);
 static inline size_t calculate_capacity(m_array_list* list, size_t min_capacity);
 static inline void grow(m_array_list* list, size_t min_capacity);
+static inline void list_null_check(m_array_list* list);
 
 
 /**
@@ -173,6 +174,21 @@ extern bool array_list_add(m_array_list* list, void* element)
     return true;
 }
 
+extern bool array_list_remove_by_index(m_array_list* list, size_t index)
+{
+    if (NULL == list)
+    {
+        perror("list must not be null");
+        exit(EXIT_FAILURE);
+    }
+    if (index < 0 || index >= list->size)
+    {
+        perror("index out of bounds");
+        exit(EXIT_FAILURE);
+    }
+
+}
+
 
 /**
  * ======================== █ █▄ █ ▀█▀ ██▀ █▀▄ █▄ █ ▄▀▄ █   =========================
@@ -202,11 +218,7 @@ static inline size_t calculate_capacity(m_array_list* list, size_t min_capacity)
 
 static inline void grow(m_array_list* list, size_t min_capacity)
 {
-    if (NULL == list)
-    {
-        perror("list must not be null");
-        exit(EXIT_FAILURE);
-    }
+    list_null_check(list);
     if (min_capacity < 0)
     {
         perror("min_capacity must be positive");
@@ -234,6 +246,15 @@ static inline void grow(m_array_list* list, size_t min_capacity)
         exit(EXIT_FAILURE);
     }
     list->capacity = new_capacity;
+}
+
+static inline void list_null_check(m_array_list* list)
+{
+    if (NULL == list)
+    {
+        perror("list must not be null");
+        exit(EXIT_FAILURE);
+    }
 }
 
 /**
