@@ -16,6 +16,7 @@ typedef struct m_vector
     size_t capacity_increment;
 } m_vector;
 
+extern m_vector *m_vector_new();
 extern m_vector *m_vector_new_with_capacity(size_t capacity);
 extern void m_vector_free(m_vector *vector);
 extern void m_vector_add(m_vector *vector, void *element);

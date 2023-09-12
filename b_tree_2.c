@@ -17,3 +17,11 @@ extern b_tree_2 *b_tree_2_new(int (*key_compare)(const void *, const void *))
     tree->key_compare = key_compare;
     return tree;
 }
+
+extern b_tree_insert_result b_tree_2_insert(b_tree_2 *tree, void *key, void *value)
+{
+    if (NULL == tree || NULL == key)
+    {
+        return INSERT_FAILURE;
+    }
+}

@@ -138,7 +138,35 @@ static inline void signal_test(void)
     printf("raise the SIGINT\n");
     int result = raise(SIGINT);
 }
- 
+
+typedef struct DEMO
+{
+    char *name;
+    int age;
+} DEMO;
+
+DEMO *data_list[20];
+
+static void data_list_write(void)
+{
+    for (int i = 0; i < 20; i++)
+    {
+        DEMO *demo = malloc(sizeof(DEMO));
+        demo->name = malloc(sizeof(char) * 10);
+        sprintf(demo->name, "demo%d", i);
+        demo->age = i;
+        data_list[i] = demo;
+    }
+}
+
+static void data_list_reader(void)
+{
+    for (int i = 0; i < 20; i++)
+    {
+        printf("the demo's name is %s, and age is %d\n", data_list[i]->name, data_list[i]->age);
+    }
+}
+
 extern void chapt_16_demo_run(void)
 {
     // atoi_test();
@@ -146,8 +174,11 @@ extern void chapt_16_demo_run(void)
     // sqrt_test();
     // trigonometric_functions_test();
     // time_test();
-    signal_test();
+    // signal_test();
     // jump_test();
+
+    data_list_write();
+    data_list_reader();
 }
 
 #endif

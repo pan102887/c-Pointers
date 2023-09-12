@@ -18,6 +18,7 @@
 #include "chapt_16_demo.h"
 #include "b_tree.h"
 #include "kmp.h"
+#include "m_array_list.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -36,7 +37,9 @@ static const Runable runable_list[] = {
     {chapt_14_demo_run, "chapt_14_demo_run"},
     {chapt_15_demo_run, "chapt_15_demo_run"},
     {chapt_16_demo_run, "chapt_16_demo_run"},
-    {b_tree_test, "b_tree_test"}};
+    {b_tree_test, "b_tree_test"},
+    {array_list_test, "array_list_test"},
+    };
 
 static const size_t runable_list_size = (sizeof(runable_list) / sizeof(Runable));
 

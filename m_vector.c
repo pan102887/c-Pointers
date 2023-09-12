@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define INITAL_CAPACITY 10
+static inline void* empty_list[0];
 /**
  * @brief create a new m_vector object
  *
@@ -12,7 +12,6 @@
  * @param capacity_increment the increment of the capacity when the vector is full
  * @return m_vector*
  */
-extern m_vector *m_vector_new_with_capacity(size_t capacity)
 extern m_vector *m_vector_new_with_capacity(size_t capacity)
 {
     m_vector *vector = malloc(sizeof(m_vector));
