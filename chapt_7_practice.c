@@ -1,5 +1,12 @@
 #include "chapt_7_practice.h"
 
+#include "global.h"
+
+#include <stdlib.h>
+#include <assert.h>
+#include <stdio.h>
+#include <stdarg.h>
+
 int hermite(int n, int x)
 {
     if (n <= 0)
@@ -75,14 +82,18 @@ __fortify_function int my_printf(const char *__restrict __fmt, ...)
     return __printf_chk(__USE_FORTIFY_LEVEL - 1, __fmt, __va_arg_pack());
 }
 
-void chapt_7_run(void)
+#ifdef _TEST_
+
+static const char *memory_boundary_alignment = "chapt_7_practice";
+void chapt_7_practice_run(void)
 {
-    printf("--------------------chapt_7_practice--------------------\n");
+    print_dividing_line(memory_boundary_alignment);
     printf("hermite(3, 2)-> expect: 40, actual: %d\n", hermite(3, 2));
     printf("my_gcd(6, 3)-> expect: 3, actual: %d\n", my_gcd(6, 3));
     printf("my_gcd(6, 4)-> expect: 2, actual: %d\n", my_gcd(6, 4));
     printf("ascii_to_integer(\"123\")-> expect: 123, actual: %d\n", ascii_to_integer("123"));
     printf("max_list(4, 3, 2, 5, 6)-> expect: 6, actual: %d\n", max_list(4, 3, 2, 5, 6));
     my_printf("this is test for \"my_print\", number:%d\n", 10);
-    printf("====================chapt_7_practice====================\n\n");
+    print_dividing_line("");
 }
+#endif

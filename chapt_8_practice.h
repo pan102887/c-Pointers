@@ -1,12 +1,6 @@
 #ifndef _CHAPTER_8_PRACTICE_H_
 #define _CHAPTER_8_PRACTICE_H_
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <string.h>
-
 int identity_matrix(int *mat, int nmat);
 /**
  * mat1 是一个 x * y 的矩阵
@@ -29,17 +23,8 @@ int matrix_multiply(int *mat1, int *mat2, int *r, int x, int y, int z);
  * @return int 用于表示一个向量（一维数组）的下标
  */
 int array_offset(int arrayinfo[], ...);
-
-/**
- * @brief 八皇后问题
- *        皇后可以攻击同一行、同一列、同一对角线上的棋子
- *        在一个 8 * 8 的棋盘上，放置 8 个皇后，使得任意两个皇后都不能互相攻击
- *        
- * 
- * @return int[8][2] 八个皇后的位置
- */
-int eight_queens(int *result[8][2]);
-
+#ifdef _TEST_
 void chapt_8_practice_run(void);
+#endif // _TEST_
 
-#endif
+#endif // _CHAPTER_8_PRACTICE_H_

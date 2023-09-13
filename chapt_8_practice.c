@@ -1,4 +1,11 @@
 #include "chapt_8_practice.h"
+#include "global.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <assert.h>
+#include <string.h>
 
 int identity_matrix(int *mat, int nmat)
 {
@@ -143,15 +150,14 @@ void test_array_offset(void)
     assert(result6 == 88 || !printf("result actual is: %d\n", result6));
 }
 
-int eight_queens(int *result[8][2]) {
-    return 0;
-}
-
+#ifdef _TEST_
+static const char *memory_boundary_alignment = "chapt_8_practice";
 void chapt_8_practice_run(void)
 {
-    printf("--------------------chapt_8_practice--------------------\n");
+    print_dividing_line(memory_boundary_alignment);
     test_identity_matrix();
     test_matrix_multiply();
     test_array_offset();
-    printf("====================chapt_8_practice====================\n\n");
+    print_dividing_line("");
 }
+#endif

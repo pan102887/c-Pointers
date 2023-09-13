@@ -1,0 +1,26 @@
+{
+    "files.associations": {
+        "cstdlib": "c",
+        "stdio.h": "c",
+        "stdbool.h": "c",
+        "math.h": "c",
+        "test.h": "c",
+        "libc-header-start.h": "c",
+        "math-vector.h": "c",
+        "libm-simd-decl-stubs.h": "c",
+        "sigevent_t.h": "c",
+        "stddef.h": "c",
+        "string.h": "c",
+        "array": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "vector": "c",
+        "memory": "c",
+        "functional": "c",
+        "*.tcc": "c",
+        "deque": "c",
+        "string": "c",
+        "string_view": "c",
+        "m_array_list.h": "c"
+    }
+}
