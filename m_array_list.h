@@ -20,19 +20,11 @@ extern m_array_list *m_array_list_new();
 extern m_array_list *m_array_list_new_with_capacity(size_t capacity);
 extern m_array_list *m_array_list_new_with_array(void **array, size_t array_size);
 extern void m_array_list_free(m_array_list *list);
-extern void m_array_list_and_data_free(m_array_list *list, void (*free_element)(void *));
+extern void m_array_list_and_data_free(m_array_list **list, void (*free_element)(void *));
 extern void *array_list_get(m_array_list *list, size_t index);
 extern void array_list_set(m_array_list *list, size_t index, void *element);
 extern bool array_list_add(m_array_list *list, void *element);
-
-/**
- * @brief 根据元素位置从list删除元素（需要手动释放元素内存）
- *
- * @param list list
- * @param index 元素内存位置
- * @return void* 元素内存地址
- */
-extern void *remove_from_array_list_by_index(m_array_list *list, size_t index);
+extern void *array_list_get_and_delete(m_array_list *list, size_t index);
 
 /**
  * @brief 根据地址value从list删除元素（需要手动释放元素内存）

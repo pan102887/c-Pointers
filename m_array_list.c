@@ -107,26 +107,27 @@ extern void m_array_list_free(m_array_list *list)
     free(list);
 }
 
-extern void m_array_list_and_data_free(m_array_list *list, void (*free_element)(void *))
+extern void m_array_list_and_data_free(m_array_list **list, void (*free_element)(void *))
 {
-    if (NULL == list)
+    if (NULL == list || NULL == *list)
     {
         return;
     }
-    if (NULL != list->element_data)
+    if (NULL != (*list)->element_data)
     {
         // todo: 解决指针相同时重复释放的问题
-        for (size_t i = 0; i < list->size; i++)
+        for (size_t i = 0; i < (*list)->size; i++)
         {
-            if (NULL != list->element_data[i])
+            if (NULL != (*list)->element_data[i])
             {
-                free_element(list->element_data[i]);
-                list->element_data[i] = NULL;
+                free_element((*list)->element_data[i]);
+                (*list)->element_data[i] = NULL;
             }
         }
-        free(list->element_data);
+        free((*list)->element_data);
     }
-    free(list);
+    free(*list);
+    *list = NULL;
 }
 
 extern void *array_list_get(m_array_list *list, size_t index)
@@ -171,7 +172,17 @@ extern bool array_list_add(m_array_list *list, void *element)
     return true;
 }
 
-extern void *remove_from_array_list_by_index(m_array_list *list, size_t index)
+extern size_t array_list_size(m_array_list *list)
+{
+    if (NULL == list)
+    {
+        perror("list must not be null");
+        exit(EXIT_FAILURE);
+    }
+    return list->size;
+}
+
+extern void *array_list_get_and_delete(m_array_list *list, size_t index)
 {
     if (NULL == list)
     {
@@ -366,7 +377,7 @@ static inline void int_free(void *p)
     free(p);
 }
 
-extern void array_list_test(void)
+static inline void array_list_nornal_test(void)
 {
     m_array_list *list = m_array_list_new();
 
@@ -384,10 +395,17 @@ extern void array_list_test(void)
     {
         printf("the element of index %zu is %d\n", i, *((int *)array_list_get(list, i)));
     }
-    for (size_t i = 0; i < list->size; i++)
-    {
-        printf("the element of index %zu is %d\n", i, *((int *)array_list_get(list, i)));
-    }
-    m_array_list_and_data_free(list, int_free);
+
+    printf("list's size: %zu\n", list->size);
+    p = array_list_get_and_delete(list, 0);
+
+    printf("list[0]: %d\n", *p);
+    printf("list's size: %zu\n", list->size);
+    m_array_list_and_data_free(&list, int_free);
+}
+
+extern void array_list_test(void)
+{
+    array_list_nornal_test();
 }
 #endif

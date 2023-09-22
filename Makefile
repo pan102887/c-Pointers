@@ -1,4 +1,4 @@
-cc := gcc
+cc := gcc-12
 project := c-demo
 
 object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o \
