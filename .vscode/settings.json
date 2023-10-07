@@ -21,6 +21,10 @@
         "deque": "c",
         "string": "c",
         "string_view": "c",
-        "m_array_list.h": "c"
+        "m_array_list.h": "c",
+        "compare": "c",
+        "type_traits": "c",
+        "assert.h": "c",
+        "initializer_list": "c"
     }
 }
