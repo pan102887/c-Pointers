@@ -25,6 +25,9 @@
         "compare": "c",
         "type_traits": "c",
         "assert.h": "c",
-        "initializer_list": "c"
+        "initializer_list": "c",
+        "tt_tree.h": "c",
+        "stdlib.h": "c",
+        "m_def.h": "c"
     }
 }

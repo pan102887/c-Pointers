@@ -1,254 +1,487 @@
 #include "tt_tree.h"
+
+#include "m_def.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-// ========================= struct define ===========================
+#define NEW(type) ((type *)malloc_with_check(sizeof(type)))
 
-/* ******** node struct ********* */
-/*|————————————————————————————————————————————|*/
-/*|head:                                       |*/
-/*|       node_info_t node_info;               |*/
-/*|       size_t left_key_size;                |*/
-/*|       size_t left_data_size;               |*/
-/*|       size_t right_key_size;               |*/
-/*|       size_t right_data_size;              |*/
-/*|————————————————————————————————————————————|*/
-/*|left:  void *left_child                     |*/
-/*|————————————————————————————————————————————|*/
-/*|right: void *midle_child                    |*/
-/*|————————————————————————————————————————————|*/
-/*|right: void *right_child                    |*/
-/*|————————————————————————————————————————————|*/
-/*|right: void *fourth_child                   |*/
-/*|————————————————————————————————————————————|*/
-/*|data:  tt_key_t left_key;                   |*/
-/*|       value_t left_value;                  |*/
-/*|       tt_key_t right_key;                  |*/
-/*|       value_t right_value;                 |*/
-/*|————————————————————————————————————————————|*/
-
-typedef unsigned char node_info_t;
-
-
-#define NODE_TYPE_MASK ((node_info_t)0xC0) /*1100 0000*/
-
-#define TWO_NODE_TYPE ((node_info_t)(0))
-#define THREE_NODE_TYPE ((node_info_t)(1))
-#define FOUR_NODE_TYPE ((node_info_t)(2))
-#define DETAULT_NODE_TYPE TWO_NODE_TYPE
-
-#define NODE_INFO(node) (*(node_info_t *)node)
-#define SET_NODE_TYPE(node, type) (NODE_INFO(node) = (NODE_INFO(node) & ~NODE_TYPE_MASK) | (type << 6))
-#define GET_NODE_TYPE(node) ((NODE_INFO(node) & NODE_TYPE_MASK) >> 6)
-
-#define IS_TWO_NODE(node) (GET_NODE_TYPE(node) == TWO_NODE_TYPE)
-#define IS_THREE_NODE(node) (GET_NODE_TYPE(node) == THREE_NODE_TYPE)
-#define IS_FOUR_NODE(node) (GET_NODE_TYPE(node) == FOUR_NODE_TYPE)
-
-#define LEFT_KEY_SIZE(node) (*(size_t*)(node + sizeof(node_info_t)))
-#define LEFT_DATA_SIZE(node) (*(size_t *)(node + sizeof(node_info_t) + sizeof(size_t)))
-
-#define RIGHT_KEY_SIZE(node) (*(size_t*)(node + sizeof(node_info_t) + sizeof(size_t) * 2))
-#define RIGHT_DATA_SIZE(node) (*(size_t *)(node + sizeof(node_info_t) + sizeof(size_t) * 3))
-#define HEAD_SIZE (sizeof(node_info_t) + (sizeof(size_t) * 4))
-
-
-#define LEFT_CHILD(node) (*(void **)(node + HEAD_SIZE))
-#define MIDDLE_CHILD(node) (*(void **)(node + HEAD_SIZE + sizeof(void *)))
-#define RIGHT_CHILD(node) (*(void **)(node + HEAD_SIZE + sizeof(void *) * 2))
-#define TEMP_CHILD(node) (*(void **)(node + HEAD_SIZE + sizeof(void *) * 3))
-
-#define CHILD_P_SIZE (sizeof(void *) * 4)
-
-
-#define LEFT_KEY(node) (*(tt_key_t*)(node + HEAD_SIZE + CHILD_P_SIZE))
-#define LEFT_DATA(node) (*(value_t*)(node + HEAD_SIZE + CHILD_P_SIZE + sizeof(tt_key_t)))
-
-#define RIGHT_KEY(node) (*(tt_key_t*)(node + HEAD_SIZE + CHILD_P_SIZE + sizeof(tt_key_t) + sizeof(value_t)))
-#define RIGHT_DATA(node) (*(value_t*)(node + HEAD_SIZE + CHILD_P_SIZE + sizeof(tt_key_t) + sizeof(value_t) + sizeof(tt_key_t)))
-
-#define KEY_VALUE_SIZE (sizeof(tt_key_t) + sizeof(value_t))
-#define DATA_P_SIZE (KEY_VALUE_SIZE * 2)
-#define NODE_SIZE (HEAD_SIZE + CHILD_P_SIZE + DATA_P_SIZE)
-
-// ========================= macro define ===========================
-
-
-
-#define POINTER_FREE(ptr) \
-    do                    \
-    {                     \
-        if (NULL == ptr)  \
-            break;        \
-        free(ptr);        \
-        ptr = NULL;       \
-    } while (0)
-
-#define SET_DATA(data_ptr,data,size)    \
-    do                                  \
-    {                                   \
-        if (NULL != data_ptr)           \
-        {                               \
-            free(data_ptr);             \
-            data_ptr = NULL;            \
-        }                               \
-        data_ptr = malloc(size);        \
-        if (NULL == data_ptr)           \
-        {                               \
-            perror("malloc");           \
-            exit(EXIT_FAILURE);         \
-        }                               \
-        memcpy(data_ptr, data, size);   \
-    } while (0)
-
-// ========================= static function ===========================
-
-static inline void *new_node(void);
-static inline void free_node(void **node);
-static inline void set_left_data(void *node, char *data, size_t size);
-static inline void set_right_data(void *node, char *data, size_t size);
-
-static inline void *new_node(void)
+static inline void *malloc_with_check(size_t size)
 {
-    void *node = NULL;
-    node = malloc(NODE_SIZE);
-    if (node == NULL)
+    void *ptr = malloc(size);
+    if (ptr == NULL)
     {
         perror("malloc");
-        exit(EXIT_FAILURE);
+        printf("malloc failed\n");
+        exit(1);
     }
-    SET_NODE_TYPE(node, DETAULT_NODE_TYPE);
+    return ptr;
+}
 
-    LEFT_KEY_SIZE(node) = 0;
-    LEFT_DATA_SIZE(node) = 0;
-    RIGHT_KEY_SIZE(node) = 0;
-    RIGHT_DATA_SIZE(node) = 0;
+typedef char *key_type;
+typedef char *value_type;
 
-    LEFT_CHILD(node) = NULL;
-    MIDDLE_CHILD(node) = NULL;
-    RIGHT_CHILD(node) = NULL;
-    TEMP_CHILD(node) = NULL;
+typedef enum
+{
+    TWO_NODE,
+    THREE_NODE,
+    UNKNOWN
+} node_type;
 
-    LEFT_KEY(node) = NULL;
-    LEFT_DATA(node) = NULL;
-    RIGHT_KEY(node) = NULL;
-    RIGHT_DATA(node) = NULL;
+typedef struct tt_tree_node_wrapper
+{
+    struct tt_tree_node_wrapper *parent;
+    node_type type;
+    void *node;
+} node_wrapper;
+typedef struct tt_tree_node_wrapper *node_wrapper_ptr;
+
+typedef struct two_node
+{
+    key_type key;
+    value_type value;
+    node_wrapper_ptr left;
+    node_wrapper_ptr right;
+} two_node;
+typedef struct two_node *two_node_ptr;
+
+typedef struct three_node
+{
+    key_type left_key;
+    value_type left_value;
+    key_type right_key;
+    value_type right_value;
+    node_wrapper_ptr left;
+    node_wrapper_ptr middle;
+    node_wrapper_ptr right;
+} three_node;
+typedef struct three_node *three_node_ptr;
+
+static inline node_wrapper_ptr node_create();
+static inline two_node_ptr two_node_create();
+static inline three_node_ptr three_node_create();
+
+static inline void node_destroy(node_wrapper_ptr *node);
+static inline void two_node_destroy(two_node_ptr *node);
+static inline void three_node_destroy(three_node_ptr *node);
+static inline void node_insert(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type));
+static inline void insert(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type));
+static inline void insert_into_two_node(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type));
+static inline void insert_into_three_node(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type));
+
+static inline node_wrapper_ptr node_create()
+{
+    node_wrapper_ptr node = NEW(node_wrapper);
+    node->parent = NULL;
+    node->type = UNKNOWN;
+    node->node = NULL;
     return node;
 }
 
-static inline void free_node(void **node)
+static inline two_node_ptr two_node_create()
+{
+    two_node_ptr node = NEW(two_node);
+    node->key = NULL;
+    node->value = NULL;
+    node->left = NULL;
+    node->right = NULL;
+    return node;
+}
+
+static inline three_node_ptr three_node_create()
+{
+    three_node_ptr node = NEW(three_node);
+    node->left_key = NULL;
+    node->left_value = NULL;
+    node->right_key = NULL;
+    node->right_value = NULL;
+    node->left = NULL;
+    node->middle = NULL;
+    node->right = NULL;
+    return node;
+}
+
+static inline void node_destroy(node_wrapper_ptr *node)
 {
     if (NULL == node || NULL == *node)
     {
         return;
     }
-    POINTER_FREE(LEFT_CHILD(*node));
-    POINTER_FREE(MIDDLE_CHILD(*node));
-    POINTER_FREE(RIGHT_CHILD(*node));
-    POINTER_FREE(TEMP_CHILD(*node));
-    POINTER_FREE(LEFT_KEY(*node));
-    POINTER_FREE(LEFT_DATA(*node));
-    POINTER_FREE(RIGHT_KEY(*node));
-    POINTER_FREE(RIGHT_DATA(*node));
-    POINTER_FREE(*node);
+    switch ((*node)->type)
+    {
+    case TWO_NODE:
+    {
+        two_node_destroy((two_node_ptr *)&(*node)->node);
+        break;
+    }
+
+    case THREE_NODE:
+    {
+        three_node_destroy((three_node_ptr *)&(*node)->node);
+        break;
+    }
+    default:
+    {
+        break;
+    }
+    }
 }
 
-static inline void set_left_data(void *node, char *data, size_t size)
+static inline void two_node_destroy(two_node_ptr *node)
 {
-    if (NULL == node || NULL == data || size == 0)
+    if (node == NULL || *node == NULL)
     {
         return;
     }
-    LEFT_DATA_SIZE(node) = size;
-    SET_DATA(LEFT_DATA(node), data, size);
+    free((*node)->key);
+    free((*node)->value);
+    node_destroy(&(*node)->left);
+    node_destroy(&(*node)->right);
+    free(*node);
+    *node = NULL;
 }
 
-static inline void set_right_data(void *node, char *data, size_t size)
+static inline void three_node_destroy(three_node_ptr *node)
 {
-    if (NULL == node || NULL == data || size == 0)
+    if (node == NULL || *node == NULL)
     {
         return;
     }
-    RIGHT_DATA_SIZE(node) = size;
-    SET_DATA(RIGHT_DATA(node), data, size);
+    free((*node)->left_key);
+    free((*node)->left_value);
+    free((*node)->right_key);
+    free((*node)->right_value);
+    node_destroy(&(*node)->left);
+    node_destroy(&(*node)->middle);
+    node_destroy(&(*node)->right);
+    free(*node);
+    *node = NULL;
 }
 
-
-extern tt_tree_entry *tt_tree_create(void)
+static inline void node_insert(node_wrapper_ptr *node_wrapper, key_type key, value_type value, int (*compare)(key_type, key_type))
 {
-    tt_tree_entry *tree = NULL;
-    tree = malloc(sizeof(tt_tree_entry));
-    if (NULL == tree)
-    {
-        perror("malloc");
-        exit(EXIT_FAILURE);
-    }
-    tree->root = new_node();
-    return tree;
-}
-extern void tt_tree_destroy(tt_tree_entry *tree)
-{
-    if (NULL == tree)
+    if (NULL == node_wrapper  || NULL == *node_wrapper || NULL == key || NULL == compare)
     {
         return;
     }
-    free_node(&tree->root);
-    POINTER_FREE(tree);
+    if (NULL == (*node_wrapper)->node && UNKNOWN == (*node_wrapper)->type)
+    {
+        two_node_ptr two_node = two_node_create();
+        two_node->key = key;
+        two_node->value = value;
+        two_node->left = NULL;
+        two_node->right = NULL;
+        (*node_wrapper)->type = TWO_NODE;
+        (*node_wrapper)->node = two_node;
+        return;
+    }
+    else
+    {
+        insert(node_wrapper, key, value, compare);
+    }
 }
-extern void tt_tree_insert(tt_tree_entry *tree, tt_key_t key, value_t value, int (*compare)(value_t, value_t))
+
+static inline void insert(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type))
 {
-    if (NULL == tree || NULL == key || NULL == value || NULL == compare)
+    if (NULL == node || NULL == *node || NULL == key || NULL == compare)
     {
         return;
     }
-    void *node = NULL;
-    node = tree->root;
+    node_wrapper_ptr *parent = NULL;
+    node_wrapper_ptr *position = node;
+    while (NULL != *position)
+    {
+        parent = position;
+        switch ((*position)->type)
+        {
+        case TWO_NODE:
+        {
+            two_node_ptr two_node = (two_node_ptr)((*position)->node);
+            int compare_result = compare(key, two_node->key);
+            if (compare_result < 0)
+            {
+                position = &(two_node->left);
+            }
+            else if (compare_result > 0)
+            {
+                position = &(two_node->right);
+            }
+            else
+            {
+                two_node->value = value;
+                return;
+            }
+        }
+        case THREE_NODE:
+        {
+            three_node_ptr three_node = (three_node_ptr)((*position)->node);
+            int left_compare_result = compare(key, three_node->left_key);
+            if (left_compare_result < 0)
+            {
+                position = &(three_node->left);
+            }
+            else if (left_compare_result > 0)
+            {
+                int right_compare_result = compare(key, three_node->right_key);
+                if (right_compare_result < 0)
+                {
+                    position = &(three_node->middle);
+                }
+                else if (right_compare_result > 0)
+                {
+                    position = &(three_node->right);
+                }
+                else
+                {
+                    three_node->right_value = value;
+                    return;
+                }
+            }
+            else
+            {
+                three_node->left_value = value;
+                return;
+            }
+        }
+        }
+    }
+    if (NULL == *parent)
+    {
+        return;
+    }
+    switch ((*parent)->type)
+    {
+    case TWO_NODE:
+    {
+        insert_into_two_node(parent, key, value, compare);
+    }
+    case THREE_NODE:
+    {
+        insert_into_three_node(parent, key, value, compare);
+    }
+    }
+
 }
-extern void tt_tree_delete(tt_tree_entry *tree, tt_key_t key);
-extern value_t tt_tree_search(tt_tree_entry *tree, tt_key_t key);
 
-/**
- * ======================== ▀█▀ ██▀ ▄▀▀ ▀█▀  ========================
- * ========================  █  █▄▄ ▄█▀  █   ========================
- */
-#ifdef _TEST_
-#include <assert.h>
-
-static inline void free_test(void)
+static inline void insert_into_two_node(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type))
 {
-    void *node = NULL;
-    node = new_node();
-    assert(node != NULL);
+    if (NULL == node || NULL == *node || NULL == key || NULL == compare || (*node)->type != TWO_NODE)
+    {
+        return;
+    }
+    two_node_ptr two_node = (two_node_ptr)((*node)->node);
+    int compare_result = compare(key, two_node->key);
+    if (compare_result < 0)
+    {
+        three_node_ptr three_node = three_node_create();
+        three_node->left_key = key;
+        three_node->left_value = value;
+        three_node->right_key = two_node->key;
+        three_node->right_value = two_node->value;
 
-    set_left_data(node, "hello", 6);
-    assert(LEFT_DATA_SIZE(node) == 6);
-    assert(LEFT_DATA(node) != NULL);
+        three_node->left = NULL;
+        three_node->middle = two_node->left;
+        three_node->right = two_node->right;
+
+        (*node)->node = three_node;
+        (*node)->type = THREE_NODE;
+        free(two_node);
+    }
+    else if (compare_result > 0)
+    {
+        three_node_ptr three_node = three_node_create();
+        three_node->left_key = two_node->key;
+        three_node->left_value = two_node->value;
+        three_node->right_key = key;
+        three_node->right_value = value;
+        three_node->left = two_node->left;
+        three_node->middle = two_node->right;
+        three_node->right = NULL;
+
+        (*node)->node = three_node;
+        (*node)->type = THREE_NODE;
+        free(two_node);
+    }
+    else
+    {
+        two_node->value = value;
+    }
+}
+
+static inline void insert_into_three_node(node_wrapper_ptr *node, key_type key, value_type value, int (*compare)(key_type, key_type))
+{
+    if (NULL == node || NULL == *node || NULL == key || NULL == compare || (*node)->type != THREE_NODE)
+    {
+        return;
+    }
+    three_node_ptr three_node = (three_node_ptr)((*node)->node);
+    int left_compare_result = compare(key, three_node->left_key);
+    int right_compare_result = compare(key, three_node->right_key);
+
+    key_type root_key = NULL;
+    value_type root_value = NULL;
+
+    node_wrapper_ptr left = NULL;
+    node_wrapper_ptr right = NULL;
+
+    if (left_compare_result < 0)
+    {
+        root_key = three_node->left_key;
+        root_value = three_node->left_value;
+
+        two_node_ptr left_node = two_node_create();
+        left_node->key = key;
+        left_node->value = value;
+        left_node->left = NULL;
+        left_node->right = three_node->left;
+        left = node_create();
+        left->node = left_node;
+        left->type = TWO_NODE;
+
+        two_node_ptr right_node = two_node_create();
+        right_node->key = three_node->right_key;
+        right_node->value = three_node->right_value;
+        right_node->left = three_node->middle;
+        right_node->right = three_node->right;
+        right = node_create();
+        right->node = right_node;
+        right->type = TWO_NODE;
+    }
+    else if (left_compare_result > 0)
+    {
+        if (right_compare_result < 0)
+        {
+            root_key = key;
+            root_value = value;
+
+            two_node_ptr left_node = two_node_create();
+            left_node->key = three_node->left_key;
+            left_node->value = three_node->left_value;
+            left_node->left = three_node->left;
+            left_node->right = three_node->middle;
+            left = node_create();
+            left->node = left_node;
+            left->type = TWO_NODE;
+
+            two_node_ptr right_node = two_node_create();
+            right_node->key = three_node->right_key;
+            right_node->value = three_node->right_value;
+            right_node->left = NULL;
+            right_node->right = three_node->right;
+            right = node_create();
+            right->node = right_node;
+            right->type = TWO_NODE;
+        }
+        else if (right_compare_result > 0)
+        {
+            root_key = three_node->right_key;
+            root_value = three_node->right_value;
+
+            two_node_ptr left_node = two_node_create();
+            left_node->key = three_node->left_key;
+            left_node->value = three_node->left_value;
+            left_node->left = three_node->left;
+            left_node->right = three_node->middle;
+            left = node_create();
+            left->node = left_node;
+            left->type = TWO_NODE;
+
+            two_node_ptr right_node = two_node_create();
+            right_node->key = key;
+            right_node->value = value;
+            right_node->left = three_node->right;
+            right_node->right = NULL;
+            right = node_create();
+            right->node = right_node;
+            right->type = TWO_NODE;
+        }
+        else
+        {
+            three_node->right_value = value;
+            return;
+        }
+    }
+    else
+    {
+        three_node->left_value = value;
+        return;
+    }
+    if (NULL == (*node)->parent)
+    {
+        two_node_ptr root = two_node_create();
+        root->key = root_key;
+        root->value = root_value;
+        root->left = left;
+        root->right = right;
+        (*node)->node = root;
+        (*node)->type = TWO_NODE;
+        free(three_node);
+    }
+    else
+    {
+        node_wrapper_ptr parent = (*node)->parent;
+        switch (parent->type)
+        {
+        case TWO_NODE:
+        {
+            insert_into_two_node(&parent, root_key, root_value, compare);
+            break;
+        }
+        case THREE_NODE:
+        {
+            insert_into_three_node(&parent, root_key, root_value, compare);
+            break;
+        }
+        }
     
-    POINTER_FREE(LEFT_DATA(node));
-    assert(LEFT_DATA(node) == NULL);
-
-    free_node(&node);
-    assert(node == NULL);
+    }
 }
-static inline void micro_test(void)
+
+
+
+extern tt_tree_entry_ptr tt_tree_create(int (*compare)(tt_key_type, tt_key_type))
 {
-    void *node = NULL;
-    node = new_node();
-    printf("node type: %s\n", IS_TWO_NODE(node) ? "two node" : "three node");
-
-    set_left_data(node, "hello", 6);
-    set_right_data(node, "world", 6);
-    printf("left data size: %ld\n", LEFT_DATA_SIZE(node));
-    printf("left data: %s\n", LEFT_DATA(node));
-    printf("right data size: %ld\n", RIGHT_DATA_SIZE(node));
-    printf("right data: %s\n", RIGHT_DATA(node));
-    free_node(&node);
-    printf("node: %p\n", node);
+    tt_tree_entry_ptr entry = NEW(tt_tree_entry);
+    entry->root = NULL;
+    entry->compare = compare;
+    return entry;
 }
+extern void tt_tree_destroy(tt_tree_entry_ptr *entry)
+{
+    if (entry == NULL || *entry == NULL)
+    {
+        return;
+    }
+    node_destroy((node_wrapper_ptr *)&(*entry)->root);
+    free(*entry);
+    *entry = NULL;
+}
+extern void tt_tree_insert(tt_tree_entry_ptr entry, tt_key_type key, tt_value_type value)
+{
+    if (NULL == entry || NULL == key)
+    {
+        return;
+    }
+    if (NULL == entry->compare)
+    {
+        return;
+    }
+
+    if (NULL == entry->root)
+    {
+        node_wrapper_ptr wrapper = node_create();
+        entry->root = wrapper;
+    }
+    node_insert(&(entry->root), key, value, entry->compare);
+}
+extern tt_value_type tt_tree_search(tt_tree_entry_ptr entry, tt_key_type key);
+extern void tt_tree_delete(tt_tree_entry_ptr entry, tt_key_type key);
+
+#ifdef _TEST_
 extern void tt_tree_test(void)
 {
-    free_test();
-    micro_test();
+    printf("tt tree test\n");
+    printf("sizeof node type: %ld\n", sizeof(node_type));
 }
 #endif
