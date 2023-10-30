@@ -429,10 +429,9 @@ static inline void insert_into_three_node(node_wrapper_ptr node, key_type key, v
         root->value = root_value;
 
         root->left = sub_left;
-        sub_left->parent = node;
-
         root->right = sub_right;
-        sub_right->parent = node;
+        set_parent(sub_left, node);
+        set_parent(sub_right, node);
 
         (node)->node = root;
         (node)->type = TWO_NODE;
@@ -440,8 +439,8 @@ static inline void insert_into_three_node(node_wrapper_ptr node, key_type key, v
     }
     else
     {
-        sub_left->parent = (node)->parent;
-        sub_right->parent = (node)->parent;
+        set_parent(sub_left, node->parent);
+        set_parent(sub_right, node->parent);
         node_wrapper_ptr parent = (node)->parent;
         switch (parent->type)
         {
