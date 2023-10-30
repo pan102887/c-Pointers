@@ -4,6 +4,9 @@
 typedef char* tt_key_type;
 typedef char* tt_value_type;
 
+typedef char *key_type;
+typedef char *value_type;
+
 typedef struct tt_tree_entry
 {
     void *root;
