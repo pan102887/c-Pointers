@@ -18,7 +18,7 @@
         "memory": "c",
         "functional": "c",
         "*.tcc": "c",
-        "deque": "c",
+        "deque": "c",   
         "string": "c",
         "string_view": "c",
         "m_array_list.h": "c",
@@ -28,6 +28,10 @@
         "initializer_list": "c",
         "tt_tree.h": "c",
         "stdlib.h": "c",
-        "m_def.h": "c"
+        "m_def.h": "c",
+        "unordered_map": "c",
+        "atomic": "c",
+        "iterator": "c",
+        "memory_resource": "c"
     }
 }
