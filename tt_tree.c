@@ -577,7 +577,7 @@ extern void tt_tree_delete(tt_tree_entry_ptr entry, tt_key_type key)
 
 #ifdef _TEST_
 #include <string.h>
-static inline key_type key_cpy(tt_key_type key)
+static inline key_type key_copy(tt_key_type key)
 {
     if (NULL == key)
     {
@@ -586,7 +586,7 @@ static inline key_type key_cpy(tt_key_type key)
     return strcpy(malloc_with_check(strlen(key) + 1), key);
 }
 
-static inline value_type value_cpy(tt_value_type value)
+static inline value_type value_copy(tt_value_type value)
 {
     if (NULL == value)
     {
@@ -597,7 +597,7 @@ static inline value_type value_cpy(tt_value_type value)
 
 extern void tt_tree_test(void)
 {
-    tt_tree_entry_ptr entry = tt_tree_create(strcmp, key_cpy, value_cpy);
+    tt_tree_entry_ptr entry = tt_tree_create(strcmp, key_copy, value_copy);
     tt_tree_insert(entry, "key2", "value2");
     tt_tree_insert(entry, "key3", "value3");
     tt_tree_insert(entry, "key5", "value5");
