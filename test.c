@@ -20,6 +20,7 @@
 #include "kmp.h"
 #include "m_array_list.h"
 #include "tt_tree.h"
+#include "rb_tree.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -41,6 +42,7 @@ static const Runable runable_list[] = {
     {b_tree_test, "b_tree_test"},
     {array_list_test, "array_list_test"},
     {tt_tree_test, "tt_tree_test"},
+    {rb_tree_test, "rb_tree_test"},
     };
 static const size_t runable_list_size = (sizeof(runable_list) / sizeof(Runable));
 
