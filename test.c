@@ -42,15 +42,8 @@ static const Runable runable_list[] = {
     {array_list_test, "array_list_test"},
     {tt_tree_test, "tt_tree_test"},
     };
-
 static const size_t runable_list_size = (sizeof(runable_list) / sizeof(Runable));
 
-static char const *const cmds[] = {
-    "-n",
-    "-i",
-    "--list",
-    "--run_all"};
-static const size_t cmds_size = (sizeof(cmds) / sizeof(char *));
 
 // ---------------------------------------------------------------
 
@@ -129,19 +122,25 @@ static void run_by_index(int argc, char **argv)
     return;
 }
 
+typedef struct test_cmd
+{
+    char *cmd;
+    void (*func)(int, char **);
+} test_cmd;
+static const test_cmd cmds[] = {
+    {"-n", run_by_name},
+    {"-i", run_by_index},
+    {"--list", list_runnable},
+    {"--run_all", run_all}};
+static const size_t cmds_size = (sizeof(cmds) / sizeof(test_cmd));
+
 static void first_command_excutor(int argc, char **argv)
 {
-    void (*func[])(int, char **) = {
-        run_by_name,
-        run_by_index,
-        list_runnable,
-        run_all};
-
     for (int i = 0; i < cmds_size; i++)
     {
-        if (strcmp(cmds[i], argv[1]) == 0)
+        if (strcmp(cmds[i].cmd, argv[1]) == 0)
         {
-            func[i](argc, argv);
+            cmds[i].func(argc, argv);
             return;
         }
     }
@@ -151,7 +150,7 @@ static int is_valide_command(const char const *command)
 {
     for (int i = 0; i < cmds_size; i++)
     {
-        if (strcmp(cmds[i], command) == 0)
+        if (strcmp(cmds[i].cmd, command) == 0)
         {
             return 1;
         }
@@ -171,7 +170,7 @@ extern void test_run(int argc, char **argv)
         printf("please run with valid command: ");
         for (int i = 0; i < cmds_size; i++)
         {
-            printf("%s, ", cmds[i]);
+            printf("%s, ", cmds[i].cmd);
         }
         printf("\n");
         return;

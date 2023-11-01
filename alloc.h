@@ -4,8 +4,9 @@
 #include <stdlib.h>
 
 
-#define malloc
+#define malloc /*don;t call malloc directly*/
 #define MALLOC(num, type) (type *)alloc((num) * sizeof(type))
+#define FREE(pp) dealloc((void **)(pp))
 extern void *alloc(size_t size);
-extern void dealloc(void *ptr);
+extern void dealloc(void **pp);
 #endif

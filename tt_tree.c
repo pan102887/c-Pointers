@@ -1,24 +1,11 @@
 #include "tt_tree.h"
-
-#include "m_def.h"
+#include "alloc.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define NEW(type) ((type *)malloc_with_check(sizeof(type)))
-
-static inline void *malloc_with_check(size_t size)
-{
-    void *ptr = malloc(size);
-    if (ptr == NULL)
-    {
-        perror("malloc");
-        printf("malloc failed\n");
-        exit(1);
-    }
-    return ptr;
-}
+#define NEW(type,size) MALLOC(size,type)
 
 typedef enum
 {
@@ -37,8 +24,8 @@ typedef struct tt_tree_node_wrapper *node_wrapper_ptr;
 
 typedef struct two_node
 {
-    key_type key;
-    value_type value;
+    tt_internal_key_type key;
+    tt_internal_value_type value;
     node_wrapper_ptr left;
     node_wrapper_ptr right;
 } two_node;
@@ -46,10 +33,10 @@ typedef struct two_node *two_node_ptr;
 
 typedef struct three_node
 {
-    key_type left_key;
-    value_type left_value;
-    key_type right_key;
-    value_type right_value;
+    tt_internal_key_type left_key;
+    tt_internal_value_type left_value;
+    tt_internal_key_type right_key;
+    tt_internal_value_type right_value;
     node_wrapper_ptr left;
     node_wrapper_ptr middle;
     node_wrapper_ptr right;
@@ -60,18 +47,18 @@ static inline node_wrapper_ptr node_create();
 static inline two_node_ptr two_node_create();
 static inline three_node_ptr three_node_create();
 
-static inline void node_destroy(node_wrapper_ptr *node);
-static inline void two_node_destroy(two_node_ptr *node);
-static inline void three_node_destroy(three_node_ptr *node);
-static inline void node_insert(node_wrapper_ptr node, key_type key, value_type value, tt_compare compare);
-static inline void insert(node_wrapper_ptr node, key_type key, value_type value, tt_compare compare);
-static inline void insert_into_two_node(node_wrapper_ptr node, key_type key, value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare);
-static inline void insert_into_three_node(node_wrapper_ptr node, key_type key, value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare);
+static inline void node_destroy(node_wrapper_ptr *node, tt_destroy destroy);
+static inline void two_node_destroy(two_node_ptr *node, tt_destroy destroy);
+static inline void three_node_destroy(three_node_ptr *node, tt_destroy destroy);
+static inline void node_insert(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, tt_compare compare);
+static inline void insert(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, tt_compare compare);
+static inline void insert_into_two_node(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare);
+static inline void insert_into_three_node(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare);
 static inline void set_parent(node_wrapper_ptr node, node_wrapper_ptr parent);
 
 static inline node_wrapper_ptr node_create()
 {
-    node_wrapper_ptr node = NEW(node_wrapper);
+    node_wrapper_ptr node = NEW(node_wrapper, 1);
     node->parent = NULL;
     node->type = UNKNOWN;
     node->node = NULL;
@@ -80,7 +67,7 @@ static inline node_wrapper_ptr node_create()
 
 static inline two_node_ptr two_node_create()
 {
-    two_node_ptr node = NEW(two_node);
+    two_node_ptr node = NEW(two_node, 1);
     node->key = NULL;
     node->value = NULL;
     node->left = NULL;
@@ -90,7 +77,7 @@ static inline two_node_ptr two_node_create()
 
 static inline three_node_ptr three_node_create()
 {
-    three_node_ptr node = NEW(three_node);
+    three_node_ptr node = NEW(three_node, 1);
     node->left_key = NULL;
     node->left_value = NULL;
     node->right_key = NULL;
@@ -101,7 +88,7 @@ static inline three_node_ptr three_node_create()
     return node;
 }
 
-static inline void node_destroy(node_wrapper_ptr *node)
+static inline void node_destroy(node_wrapper_ptr *node, tt_destroy destroy)
 {
     if (NULL == node || NULL == *node)
     {
@@ -111,13 +98,13 @@ static inline void node_destroy(node_wrapper_ptr *node)
     {
     case TWO_NODE:
     {
-        two_node_destroy((two_node_ptr *)&(*node)->node);
+        two_node_destroy((two_node_ptr *)&(*node)->node, destroy);
         break;
     }
 
     case THREE_NODE:
     {
-        three_node_destroy((three_node_ptr *)&(*node)->node);
+        three_node_destroy((three_node_ptr *)&(*node)->node, destroy);
         break;
     }
     default:
@@ -127,38 +114,41 @@ static inline void node_destroy(node_wrapper_ptr *node)
     }
 }
 
-static inline void two_node_destroy(two_node_ptr *node)
+static inline void two_node_destroy(two_node_ptr *node, tt_destroy destroy)
 {
     if (node == NULL || *node == NULL)
     {
         return;
     }
-    free((*node)->key);
-    free((*node)->value);
-    node_destroy(&(*node)->left);
-    node_destroy(&(*node)->right);
+    destroy((&(*node)->key), &((*node)->value));
+    // free((*node)->key);
+    // free((*node)->value);
+    node_destroy(&(*node)->left, destroy);
+    node_destroy(&(*node)->right, destroy);
     free(*node);
     *node = NULL;
 }
 
-static inline void three_node_destroy(three_node_ptr *node)
+static inline void three_node_destroy(three_node_ptr *node, tt_destroy destroy)
 {
     if (node == NULL || *node == NULL)
     {
         return;
     }
-    free((*node)->left_key);
-    free((*node)->left_value);
-    free((*node)->right_key);
-    free((*node)->right_value);
-    node_destroy(&(*node)->left);
-    node_destroy(&(*node)->middle);
-    node_destroy(&(*node)->right);
+    destroy(&((*node)->left_key), &((*node)->left_value));
+    // free((*node)->left_key);
+    // free((*node)->left_value);
+    destroy(&((*node)->right_key), &((*node)->right_value));
+    // free((*node)->right_key);
+    // free((*node)->right_value);
+    node_destroy(&(*node)->left, destroy);
+    node_destroy(&(*node)->middle, destroy);
+    node_destroy(&(*node)->right, destroy);
     free(*node);
     *node = NULL;
 }
 
-static inline void node_insert(node_wrapper_ptr node_wrapper, key_type key, value_type value, tt_compare compare)
+static inline void node_insert(node_wrapper_ptr node_wrapper, tt_internal_key_type key, tt_internal_value_type value, tt_compare compare)
 {
     if (NULL == node_wrapper || NULL == key || NULL == compare)
     {
@@ -181,7 +171,7 @@ static inline void node_insert(node_wrapper_ptr node_wrapper, key_type key, valu
     }
 }
 
-static inline void insert(node_wrapper_ptr node, key_type key, value_type value, tt_compare compare)
+static inline void insert(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, tt_compare compare)
 {
     if (NULL == node || NULL == key || NULL == compare)
     {
@@ -266,7 +256,7 @@ static inline void insert(node_wrapper_ptr node, key_type key, value_type value,
     }
 }
 
-static inline void insert_into_two_node(node_wrapper_ptr node, key_type key, value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare)
+static inline void insert_into_two_node(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare)
 {
     printf("insert into two node, and key is: %s, value is %s\n", key, value);
     if (NULL == node || NULL == key || NULL == compare || (node)->type != TWO_NODE)
@@ -314,7 +304,7 @@ static inline void insert_into_two_node(node_wrapper_ptr node, key_type key, val
     }
 }
 
-static inline void insert_into_three_node(node_wrapper_ptr node, key_type key, value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare)
+static inline void insert_into_three_node(node_wrapper_ptr node, tt_internal_key_type key, tt_internal_value_type value, node_wrapper_ptr left, node_wrapper_ptr right, tt_compare compare)
 {
     if (NULL == node || NULL == key || NULL == compare || node->type != THREE_NODE)
     {
@@ -323,8 +313,8 @@ static inline void insert_into_three_node(node_wrapper_ptr node, key_type key, v
     three_node_ptr three_node = (three_node_ptr)((node)->node);
     int left_compare_result = compare(key, three_node->left_key);
 
-    key_type root_key = NULL;
-    value_type root_value = NULL;
+    tt_internal_key_type root_key = NULL;
+    tt_internal_value_type root_value = NULL;
 
     node_wrapper_ptr sub_left = NULL;
     node_wrapper_ptr sub_right = NULL;
@@ -463,13 +453,18 @@ static inline void set_parent(node_wrapper_ptr node, node_wrapper_ptr parent)
     node->parent = parent;
 }
 
-extern tt_tree_entry_ptr tt_tree_create(tt_compare compare, key_cpy kconvert, value_cpy vconvert)
+extern tt_tree_entry_ptr tt_tree_create(tt_compare compare, key_cpy kconvert, value_cpy vconvert, tt_destroy destroy)
 {
-    tt_tree_entry_ptr entry = NEW(tt_tree_entry);
+    if (NULL == compare || NULL == kconvert || NULL == vconvert || NULL == destroy)
+    {
+        return NULL;
+    }
+    tt_tree_entry_ptr entry = NEW(tt_tree_entry, 1);
     entry->root = NULL;
     entry->compare = compare;
     entry->kconvert = kconvert;
     entry->vconvert = vconvert;
+    entry->destroy = destroy;
     return entry;
 }
 extern void tt_tree_destroy(tt_tree_entry_ptr *entry)
@@ -480,7 +475,7 @@ extern void tt_tree_destroy(tt_tree_entry_ptr *entry)
     }
     if (NULL != (*entry)->root)
     {
-        node_destroy((node_wrapper_ptr *)&(*entry)->root);
+        node_destroy((node_wrapper_ptr *)&(*entry)->root, (*entry)->destroy);
     }
 
     free(*entry);
@@ -498,8 +493,8 @@ extern void tt_tree_insert(tt_tree_entry_ptr entry, tt_key_type key, tt_value_ty
         node_wrapper_ptr wrapper = node_create();
         entry->root = wrapper;
     }
-    key_type key_cpy = entry->kconvert(key);
-    value_type value_cpy = entry->vconvert(value);
+    tt_internal_key_type key_cpy = entry->kconvert(key);
+    tt_internal_value_type value_cpy = entry->vconvert(value);
     node_insert((node_wrapper_ptr)(entry->root), key_cpy, value_cpy, entry->compare);
 }
 extern tt_value_type tt_tree_search(tt_tree_entry_ptr entry, tt_key_type key)
@@ -577,27 +572,37 @@ extern void tt_tree_delete(tt_tree_entry_ptr entry, tt_key_type key)
 
 #ifdef _TEST_
 #include <string.h>
-static inline key_type key_copy(tt_key_type key)
+static inline tt_internal_key_type key_copy(tt_key_type key)
 {
     if (NULL == key)
     {
         return NULL;
     }
-    return strcpy(malloc_with_check(strlen(key) + 1), key);
+    return strcpy(NEW(char, strlen(key) + 1), key);
 }
 
-static inline value_type value_copy(tt_value_type value)
+static inline tt_internal_value_type value_copy(tt_value_type value)
 {
     if (NULL == value)
     {
         return NULL;
     }
-    return strcpy(malloc_with_check(strlen(value) + 1), value);
+    return strcpy(NEW(char, strlen(value) + 1), value);
+}
+
+static inline void test_destroy(tt_internal_key_type *key, tt_internal_value_type *value)
+{
+    if (NULL == key || NULL == value)
+    {
+        return;
+    }
+    FREE(key);
+    FREE(value);
 }
 
 extern void tt_tree_test(void)
 {
-    tt_tree_entry_ptr entry = tt_tree_create(strcmp, key_copy, value_copy);
+    tt_tree_entry_ptr entry = tt_tree_create(strcmp, key_copy, value_copy, test_destroy);
     tt_tree_insert(entry, "key2", "value2");
     tt_tree_insert(entry, "key3", "value3");
     tt_tree_insert(entry, "key5", "value5");

@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 static void memory_alloc_test() {
     print_dividing_line("memory_alloc_test");
@@ -17,7 +18,9 @@ static void memory_alloc_test() {
         printf("%d ", array[i]);
     }
     printf("\n");
-    dealloc(array);
+    assert(NULL != array);
+    FREE(&array);
+    assert(NULL == array);
     multi_dividing_line(2, "memory_alloc_test", "end");
 }
 

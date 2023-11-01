@@ -13,11 +13,11 @@ extern void *alloc(size_t size)
     return p;
 }
 
-extern void dealloc(void *ptr)
+extern void dealloc(void **pp)
 {   
-    if (NULL == ptr) {
+    if (NULL == pp || NULL == *pp) {
         return;
     }
-    free(ptr);
-    ptr = NULL;
+    free(*pp);
+    *pp = NULL;
 }
