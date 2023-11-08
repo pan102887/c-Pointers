@@ -80,6 +80,10 @@ static inline void rotate_left(rb_node_ptr *root_pp)
     }
     rb_node_ptr root = *root_pp;
     rb_node_ptr right = root->right;
+    if (NULL == right)
+    {
+        return;
+    }
 
     color_t root_color = root->color;
     root->color = right->color;
@@ -105,6 +109,10 @@ static inline void rotate_right(rb_node_ptr *root_pp)
     }
     rb_node_ptr root = *root_pp;
     rb_node_ptr left = root->left;
+    if (NULL == left)
+    {
+        return;
+    }
 
     color_t root_color = root->color;
     root->color = left->color;
@@ -326,6 +334,11 @@ static void rotate_left_test()
     assert(root_right->node_count == 7);
 
     node_destroy(&root_parent, NULL);
+
+    rb_node_ptr root = node_create("root", "root");
+    rotate_left(&root);
+    assert(NULL != root);
+    node_destroy(&root, NULL);
 }
 
 extern void rb_tree_test()
