@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <assert.h>
 
 #define NEW(type, size) MALLOC(size, type)
 
@@ -28,23 +29,16 @@ typedef struct rb_node
     struct rb_node *right;
 } rb_node, *rb_node_ptr;
 
-static inline bool is_2_node(rb_node_ptr node);
 static inline color_t node_color(rb_node_ptr node);
+static inline flip_color(rb_node_ptr node);
 static inline rb_count_t size(rb_node_ptr node);
 static inline void set_parent(rb_node_ptr node, rb_node_ptr parent);
 static inline void rotate_left(rb_node_ptr *root_pp);
 static inline void rotate_right(rb_node_ptr *root_pp);
 static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_value_type value);
+static inline void insert_into_node(rb_node_ptr *node_pp, rb_internal_key_type key, rb_internal_value_type value);
 static inline void node_destroy(rb_node_ptr *node_pp, rb_desctroy_f destroy);
 
-static inline bool is_2_node(rb_node_ptr node)
-{
-    if (NULL == node)
-    {
-        return true;
-    }
-    return node->color == BLACK && node->left->color == BLACK && node->right->color == BLACK;
-}
 
 static inline color_t node_color(rb_node_ptr node)
 {
@@ -53,6 +47,23 @@ static inline color_t node_color(rb_node_ptr node)
         return BLACK;
     }
     return node->color == RED ? RED : BLACK;
+}
+
+static inline flip_color(rb_node_ptr node)
+{
+    if (NULL == node)
+    {
+        return;
+    }
+    node->color = node->color == RED ? BLACK : RED;
+    if (NULL != node->left)
+    {
+        node->left->color = node->color == RED ? BLACK : RED;
+    }
+    if (NULL != node->right)
+    {
+        node->right->color = node->color == RED ? BLACK : RED;
+    }
 }
 
 static inline rb_count_t size(rb_node_ptr node)
@@ -143,6 +154,19 @@ static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_valu
     return node;
 }
 
+static inline void insert_into_node(rb_node_ptr *node_pp, rb_internal_key_type key, rb_internal_value_type value)
+{
+    assert(NULL != node_pp);
+
+    if (NULL == *node_pp)
+    {
+        *node_pp = node_create(key, value);
+        return;
+    }
+
+    // todo: wait for implement
+}
+
 static inline void node_destroy(rb_node_ptr *node_pp, rb_desctroy_f destroy)
 {
     if (NULL == node_pp || NULL == *node_pp)
@@ -191,34 +215,9 @@ extern void rb_tree_insert(rb_tree_ptr entry, rb_key_type key, rb_value_type val
         fprintf(stderr, "Invalid argument\n");
         return;
     }
-    rb_node_ptr *position = (rb_node_ptr*)&(entry->root);
-    rb_node_ptr parent = NULL;
-    while (NULL != *position)
-    {
-        parent = *position;
-        int cmp = entry->compare(key, (*position)->key);
-        if (cmp < 0)
-        {
-            position = &((*position)->left);
-        }
-        else if (cmp > 0)
-        {
-            position = &((*position)->right);
-        }
-        else
-        {
-            rb_internal_value_type *old_value_p = &((*position)->value);
-            if (NULL != entry->destroy)
-            {
-                entry->destroy(NULL, old_value_p);
-            }
-            (*position)->value = entry->vcpy(value);
-            return;
-        }
-    }
-    *position = node_create(entry->kcpy(key), entry->vcpy(value));
-    set_parent(*position, parent);
-
+    rb_internal_key_type internal_key = entry->kcpy(key);
+    rb_internal_value_type internal_value = entry->vcpy(value);
+    insert_into_node((rb_node_ptr *)(&(entry->root)), internal_key, internal_value);
 }
 extern rb_value_type rb_tree_search(rb_tree_ptr entry, rb_key_type key)
 {
