@@ -16,6 +16,9 @@ typedef struct m_vector
     size_t capacity_increment;
 } m_vector;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern m_vector *m_vector_new();
 extern m_vector *m_vector_new_with_capacity(size_t capacity);
 extern void m_vector_free(m_vector *vector);
@@ -24,5 +27,8 @@ extern void *m_vector_get(m_vector *vector, size_t index);
 extern void m_vector_set(m_vector *vector, size_t index, void *element);
 extern void m_vector_remove(m_vector *vector, size_t index);
 extern void m_vector_clear(m_vector *vector);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -1,5 +1,6 @@
 #include "rb_tree.h"
 #include "alloc.h"
+#include "m_array_list.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -7,7 +8,6 @@
 #include <assert.h>
 #include <assert.h>
 
-#define NEW(type, size) MALLOC(size, type)
 
 typedef size_t rb_count_t;
 typedef enum rb_color
@@ -30,13 +30,14 @@ typedef struct rb_node
 } rb_node, *rb_node_ptr;
 
 static inline color_t node_color(rb_node_ptr node);
-static inline flip_color(rb_node_ptr node);
+static inline bool is_red(rb_node_ptr node);
+static inline void flip_color(rb_node_ptr node);
 static inline rb_count_t size(rb_node_ptr node);
 static inline void set_parent(rb_node_ptr node, rb_node_ptr parent);
 static inline void rotate_left(rb_node_ptr *root_pp);
 static inline void rotate_right(rb_node_ptr *root_pp);
-static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_value_type value);
-static inline void insert_into_node(rb_node_ptr *node_pp, rb_internal_key_type key, rb_internal_value_type value);
+static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_value_type value, color_t color, rb_count_t count);
+static inline rb_node_ptr insert_into_node(rb_node_ptr *h_p, rb_internal_key_type key, rb_internal_value_type value, key_compare_f compare);
 static inline void node_destroy(rb_node_ptr *node_pp, rb_desctroy_f destroy);
 
 
@@ -49,7 +50,12 @@ static inline color_t node_color(rb_node_ptr node)
     return node->color == RED ? RED : BLACK;
 }
 
-static inline flip_color(rb_node_ptr node)
+static inline bool is_red(rb_node_ptr node)
+{
+    return node_color(node) == RED;
+}
+
+static inline void flip_color(rb_node_ptr node)
 {
     if (NULL == node)
     {
@@ -141,30 +147,60 @@ static inline void rotate_right(rb_node_ptr *root_pp)
     root->node_count = size(root->left) + size(root->right) + 1;
 }
 
-static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_value_type value)
+static inline rb_node_ptr node_create(rb_internal_key_type key, rb_internal_value_type value, color_t color, rb_count_t count)
 {
     rb_node_ptr node = NEW(rb_node, 1);
-    node->color = BLACK;
+    node->color = color;
     node->key = key;
     node->value = value;
     node->parent = NULL;
     node->left = NULL;
     node->right = NULL;
-    node->node_count = 1;
+    node->node_count = count;
     return node;
 }
 
-static inline void insert_into_node(rb_node_ptr *node_pp, rb_internal_key_type key, rb_internal_value_type value)
+static inline rb_node_ptr insert_into_node(rb_node_ptr *h_p, rb_internal_key_type key, rb_internal_value_type value, key_compare_f compare)
 {
-    assert(NULL != node_pp);
-
-    if (NULL == *node_pp)
+    if (NULL == h_p)
     {
-        *node_pp = node_create(key, value);
-        return;
+        return NULL;
+    }
+    rb_node_ptr h = *h_p;
+    if (NULL == h)
+    {
+        return node_create(key, value, RED, 1);
+    }
+    int cmp = compare(key, h->key);
+    if (cmp < 0)
+    {
+        h->left = insert_into_node(&(h->left), key, value, compare);
+        set_parent(h->left, h);
+    }
+    else if (cmp > 0)
+    {
+        h->right = insert_into_node(&(h->right), key, value, compare);
+        set_parent(h->right, h);
+    }
+    else
+    {
+        h->value = value;
     }
 
-    // todo: wait for implement
+    if (is_red(h->right) && !is_red(h->left))
+    {
+        rotate_left(&h);
+    }
+    if (is_red(h->left) && is_red(h->left->left))
+    {
+        rotate_right(&h);
+    }
+    if (is_red(h->left) && is_red(h->right))
+    {
+        flip_color(h);
+    }
+    h->node_count = size(h->left) + size(h->right) + 1;
+    return h;
 }
 
 static inline void node_destroy(rb_node_ptr *node_pp, rb_desctroy_f destroy)
@@ -217,7 +253,7 @@ extern void rb_tree_insert(rb_tree_ptr entry, rb_key_type key, rb_value_type val
     }
     rb_internal_key_type internal_key = entry->kcpy(key);
     rb_internal_value_type internal_value = entry->vcpy(value);
-    insert_into_node((rb_node_ptr *)(&(entry->root)), internal_key, internal_value);
+    entry->root = insert_into_node((rb_node_ptr*)&(entry->root), internal_key, internal_value, entry->compare);
 }
 extern rb_value_type rb_tree_search(rb_tree_ptr entry, rb_key_type key)
 {
@@ -273,16 +309,25 @@ static void create_destroy_test()
     rb_tree_destroy(&entry);
     assert(NULL == entry);
 }
-
+/**
+ * @brief 
+ * 
+ *                    o (root_parent)                                      o (root_parent)
+ *                   /                                                    /               
+ *      (root_left) o---o (root_right)        ==>        (root_left) o---o (root_right)   
+ *                 /   / \                                          / \   \               
+ *         (left) o   o   o (right)                         (left) o   o   o (right)      
+ *                 (midle)                                          (midle)               
+ */
 static void rotate_left_test()
 {
-    rb_node_ptr root_parent = node_create("root_parent", "root_parent");
-    rb_node_ptr root_left = node_create("root_left", "root_left");
-    rb_node_ptr root_right = node_create("root_right", "root_right");
+    rb_node_ptr root_parent = node_create("root_parent", "root_parent", BLACK, 6);
+    rb_node_ptr root_left = node_create("root_left", "root_left", BLACK, 5);
+    rb_node_ptr root_right = node_create("root_right", "root_right", BLACK, 3);
 
-    rb_node_ptr left = node_create("left", "left");
-    rb_node_ptr right = node_create("right", "right");
-    rb_node_ptr midile = node_create("midle", "midle");
+    rb_node_ptr left = node_create("left", "left", BLACK, 1);
+    rb_node_ptr right = node_create("right", "right", BLACK, 1);
+    rb_node_ptr midile = node_create("midle", "midle", BLACK, 1);
 
     root_parent->left = root_left;
     root_left->parent = root_parent;
@@ -334,7 +379,7 @@ static void rotate_left_test()
 
     node_destroy(&root_parent, NULL);
 
-    rb_node_ptr root = node_create("root", "root");
+    rb_node_ptr root = node_create("root", "root", BLACK, 10);
     rotate_left(&root);
     assert(NULL != root);
     node_destroy(&root, NULL);

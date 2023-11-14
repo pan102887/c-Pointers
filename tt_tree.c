@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NEW(type,size) MALLOC(size,type)
 
 typedef enum
 {

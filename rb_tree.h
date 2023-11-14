@@ -28,11 +28,19 @@ typedef struct rb_entry
 } rb_entry;
 typedef struct rb_entry *rb_tree_ptr;
 
+#ifdef cplusplus
+extern "C" {
+#endif
+
 extern rb_tree_ptr rb_tree_create(key_compare_f compare, rb_key_cpy_f kcpy, rb_value_cpy_f vcpy, rb_desctroy_f destroy);
 extern void rb_tree_destroy(rb_tree_ptr *entry);
 extern void rb_tree_insert(rb_tree_ptr entry, rb_key_type key, rb_value_type value);
 extern rb_value_type rb_tree_search(rb_tree_ptr entry, rb_key_type key);
 extern void rb_tree_delete(rb_tree_ptr entry, rb_key_type key);
+
+#ifdef cplusplus
+}
+#endif
 
 #ifdef _TEST_
 extern void rb_tree_test();
