@@ -22,6 +22,10 @@ int data_compare(DATA *data1, DATA *data2) {
             return data1->data_size - data2->data_size;
         }
     }
+    else
+    {
+        return memcmp(data1->data, data2->data, data1->data_size);
+    }
 }
 
 /**

@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 typedef enum
 {
     TWO_NODE,
@@ -233,6 +232,11 @@ static inline void insert(node_wrapper_ptr node, tt_internal_key_type key, tt_in
                 return;
             }
         }
+        case UNKNOWN:
+        {
+            fprintf(stderr, "unknown node type\n");
+            exit(1);
+        }
         break;
         }
     }
@@ -251,6 +255,11 @@ static inline void insert(node_wrapper_ptr node, tt_internal_key_type key, tt_in
     {
         insert_into_three_node(parent, key, value, NULL, NULL, compare);
         break;
+    }
+    case UNKNOWN:
+    {
+        fprintf(stderr, "unknown node type\n");
+        exit(1);
     }
     }
 }
@@ -439,6 +448,11 @@ static inline void insert_into_three_node(node_wrapper_ptr node, tt_internal_key
             insert_into_three_node((node)->parent, root_key, root_value, sub_left, sub_right, compare);
             break;
         }
+        case UNKNOWN:
+        {
+            fprintf(stderr, "unknown node type\n");
+            exit(1);
+        }
         }
     }
 }
@@ -559,6 +573,11 @@ extern tt_value_type tt_tree_search(tt_tree_entry_ptr entry, tt_key_type key)
             }
             continue;
             ;
+        }
+        case UNKNOWN:
+        {
+            fprintf(stderr, "unknown node type\n");
+            exit(1);
         }
         }
         return NULL;
