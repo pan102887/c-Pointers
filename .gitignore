@@ -54,4 +54,7 @@ dkms.conf
 c-demo
 ./c-demo
 ./.vscode
-
+.vscode
+.vscode/*
+build
+build/*

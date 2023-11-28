@@ -3,7 +3,7 @@ project := c-demo
 
 object := main.o chapt_7_practice.o chapt_8_demo.o chapt_8_practice.o eight_queens.o linked_list.o chapt_9_demo.o global.o kmp.o chapt_10_demo.o \
 	chapt_11_demo.o alloc.o chapt_12_demo.o chapt_13_demo.o my_data.o chapt_14_demo.o chapt_15_demo.o test.o b_tree.o chapt_16_demo.o m_array_list.o \
-	tt_tree.o
+	tt_tree.o rb_tree.o
 	
 common := 
 common_param := -m64 -D_TEST_ -g
@@ -78,6 +78,8 @@ m_array_list.o: m_array_list.c m_array_list.h ${common}
 tt_tree.o: tt_tree.c tt_tree.h ${common}
 	${cc} ${common_param} -c tt_tree.c -o tt_tree.o
 
+rb_tree.o: rb_tree.c rb_tree.h ${common}
+	${cc} ${common_param} -c rb_tree.c -o rb_tree.o
 
 
 .PHONY: clean

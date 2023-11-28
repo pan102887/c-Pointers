@@ -59,9 +59,9 @@ extern m_array_list *m_array_list_new_with_capacity(size_t capacity)
     return list;
 }
 
-extern m_array_list *m_array_list_new_with_array(void **array, size_t array_size)
+extern m_array_list *m_array_list_new_with_array(ele_t *array_p, size_t array_size)
 {
-    if (NULL == array)
+    if (NULL == array_p)
     {
         perror("array must not be null");
         exit(EXIT_FAILURE);
@@ -89,135 +89,136 @@ extern m_array_list *m_array_list_new_with_array(void **array, size_t array_size
 
     for (size_t i = 0; i < array_size; i++)
     {
-        list->element_data[i] = array[i];
+        list->element_data[i] = array_p[i];
     }
     return list;
 }
 
-extern void m_array_list_free(m_array_list *list)
+extern void m_array_list_free(m_array_list_p *list_pp)
 {
-    if (NULL == list)
+    if (NULL == list_pp || NULL == *list_pp)
     {
         return;
     }
-    if (NULL != list->element_data)
+    if (NULL != (*list_pp)->element_data)
     {
-        free(list->element_data);
+        free((*list_pp)->element_data);
     }
-    free(list);
+    free(*list_pp);
+    *list_pp = NULL;
 }
 
-extern void m_array_list_and_data_free(m_array_list **list, void (*free_element)(void *))
+extern void m_array_list_and_data_free(m_array_list_p *list_pp, void (*free_element)(ele_t))
 {
-    if (NULL == list || NULL == *list)
+    if (NULL == list_pp || NULL == *list_pp)
     {
         return;
     }
-    if (NULL != (*list)->element_data)
+    if (NULL != (*list_pp)->element_data)
     {
         // todo: 解决指针相同时重复释放的问题
-        for (size_t i = 0; i < (*list)->size; i++)
+        for (size_t i = 0; i < (*list_pp)->size; i++)
         {
-            if (NULL != (*list)->element_data[i])
+            if (NULL != (*list_pp)->element_data[i])
             {
-                free_element((*list)->element_data[i]);
-                (*list)->element_data[i] = NULL;
+                free_element((*list_pp)->element_data[i]);
+                (*list_pp)->element_data[i] = NULL;
             }
         }
-        free((*list)->element_data);
+        free((*list_pp)->element_data);
     }
-    free(*list);
-    *list = NULL;
+    free(*list_pp);
+    *list_pp = NULL;
 }
 
-extern void *array_list_get(m_array_list *list, size_t index)
+extern void *array_list_get(m_array_list_p list_p, size_t index)
 {
-    if (NULL == list)
+    if (NULL == list_p)
     {
         perror("list must not be null");
         exit(EXIT_FAILURE);
     }
-    if (index < 0 || index >= list->size)
+    if (index < 0 || index >= list_p->size)
     {
         perror("index out of bounds");
         exit(EXIT_FAILURE);
     }
-    return list->element_data[index];
+    return list_p->element_data[index];
 }
 
-extern void array_list_set(m_array_list *list, size_t index, void *element)
+extern void array_list_set(m_array_list_p list_p, size_t index, ele_t element)
 {
-    if (NULL == list)
+    if (NULL == list_p)
     {
         perror("list must not be null");
         exit(EXIT_FAILURE);
     }
-    if (index < 0 || index >= list->size)
+    if (index < 0 || index >= list_p->size)
     {
         perror("index out of bounds");
         exit(EXIT_FAILURE);
     }
-    list->element_data[index] = element;
+    list_p->element_data[index] = element;
 }
 
-extern bool array_list_add(m_array_list *list, void *element)
+extern bool array_list_add(m_array_list_p list_p, ele_t element)
 {
-    if (NULL == list)
+    if (NULL == list_p)
     {
         perror("list must not be null");
         exit(EXIT_FAILURE);
     }
-    ensure_capacity_internal(list, list->size + 1);
-    list->element_data[list->size++] = element;
+    ensure_capacity_internal(list_p, list_p->size + 1);
+    list_p->element_data[list_p->size++] = element;
     return true;
 }
 
-extern size_t array_list_size(m_array_list *list)
+extern size_t array_list_size(m_array_list_p list_p)
 {
-    if (NULL == list)
+    if (NULL == list_p)
     {
         perror("list must not be null");
         exit(EXIT_FAILURE);
     }
-    return list->size;
+    return list_p->size;
 }
 
-extern void *array_list_get_and_delete(m_array_list *list, size_t index)
+extern void *array_list_get_and_delete(m_array_list_p list_p, size_t index)
 {
-    if (NULL == list)
+    if (NULL == list_p)
     {
         perror("list must not be null");
         exit(EXIT_FAILURE);
     }
-    if (index < 0 || index >= list->size)
+    if (index < 0 || index >= list_p->size)
     {
         perror("index out of bounds");
         exit(EXIT_FAILURE);
     }
-    void *temp = array_list_get(list, index);
-    remove_item_from_array(list->element_data, list->size, index);
-    list->size--;
+    void *temp = array_list_get(list_p, index);
+    remove_item_from_array(list_p->element_data, list_p->size, index);
+    list_p->size--;
     return temp;
 }
 
-extern bool remove_from_array_list_by_value(m_array_list *list, void *value)
+extern bool remove_from_array_list_by_value(m_array_list_p list_p, ele_t value)
 {
-    list_null_check(list);
+    list_null_check(list_p);
     void *temp;
-    for (size_t i = 0; i < list->size; i++)
+    for (size_t i = 0; i < list_p->size; i++)
     {
-        if (list->element_data[i] == value)
+        if (list_p->element_data[i] == value)
         {
-            remove_item_from_array(list->element_data, list->size, i);
+            remove_item_from_array(list_p->element_data, list_p->size, i);
             return true;
         }
     }
     return false;
 }
 
-extern bool remove_from_list_by_predicate_and_release_data(m_array_list *list, int(*predicate(void *)), void (*release_data)(void *))
+extern bool remove_from_list_by_predicate_and_release_data(m_array_list_p list_p, int(*predicate(ele_t)), void (*release_data)(ele_t))
 {
-    list_null_check(list);
+    list_null_check(list_p);
     if (NULL == predicate)
     {
         perror("the predicate function must be not NULL");
@@ -230,49 +231,50 @@ extern bool remove_from_list_by_predicate_and_release_data(m_array_list *list, i
         perror("the release_data function is null, a memory leak may result");
     }
     bool op_result = false;
-    for (size_t i = 0; i < list->size; i++)
+    for (size_t i = 0; i < list_p->size; i++)
     {
-        if (predicate(list->element_data[i]))
+        if (predicate(list_p->element_data[i]))
         {
             op_result = true;
             if (release_data_memory)
             {
-                release_data(list->element_data[i]);
+                release_data(list_p->element_data[i]);
             }
-            remove_item_from_array(list->element_data, list->size, i);
-            list->size--;
+            remove_item_from_array(list_p->element_data, list_p->size, i);
+            list_p->size--;
         }
     }
     return op_result;
 }
 
-extern bool remove_from_list_by_cmp_and_release_data(m_array_list *list, void *value, int(*cmp(void *, void *)), void (*release_data)(void *))
+extern bool remove_from_list_by_cmp_and_release_data(m_array_list_p list_p, ele_t value, int(*cmp(ele_t, ele_t)), void (*release_data)(ele_t))
 {
-    list_null_check(list);
+    list_null_check(list_p);
     if (NULL == cmp)
     {
         perror("the cmp function must be not NULL");
         exit(EXIT_FAILURE);
     }
-    int release_data_memory = 1;
+    bool release_data_memory = true;
     if (NULL == release_data)
     {
-        release_data_memory = 0;
+        release_data_memory = false;
         perror("the release_data function is null, a memory leak may result");
     }
     bool op_result = false;
 
-    for (size_t i = 0; i < list->size; i++)
+    for (size_t i = 0; i < list_p->size; i++)
     {
-        if (0 == cmp(value, list->element_data[i]))
+        if (0 == cmp(value, list_p->element_data[i]))
         {
             op_result = true;
+            ele_t temp = list_p->element_data[i];
+            remove_item_from_array(list_p->element_data, list_p->size, i);
             if (release_data_memory)
             {
-                release_data(list->element_data[i]);
+                release_data(temp);
             }
-            remove_item_from_array(list->element_data, list->size, i);
-            list->size--;
+            list_p->size--;
         }
     }
     return op_result;

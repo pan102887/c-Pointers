@@ -13,11 +13,22 @@ extern void *alloc(size_t size)
     return p;
 }
 
-extern void dealloc(void *ptr)
+extern void dealloc(void **pp)
 {   
-    if (NULL == ptr) {
+    if (NULL == pp || NULL == *pp) {
         return;
     }
-    free(ptr);
-    ptr = NULL;
+    free(*pp);
+    *pp = NULL;
+}
+
+extern void *renew(void *p, size_t size)
+{
+    void *new_p = realloc(p, size);
+    if (NULL == new_p) {
+        fprintf(stderr, "Out of memory\n");
+        perror("renew");
+        exit(1);
+    }
+    return new_p;
 }
