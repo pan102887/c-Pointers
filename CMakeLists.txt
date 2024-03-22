@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 
-set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(c-demo LANGUAGES C CXX VERSION 0.1.0)
 file(GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/*.c ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_SOURCE_DIR}/*.cpp)
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+## == test switch ==
 target_compile_definitions(${PROJECT_NAME} PUBLIC _TEST_)

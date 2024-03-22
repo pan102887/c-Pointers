@@ -384,10 +384,30 @@ static void rotate_left_test()
     assert(NULL != root);
     node_destroy(&root, NULL);
 }
+struct Demo
+{
+    char *key;
+    int value;
+};
+
+#define container_of(ptr, type, member) \
+        ((type *)((void *)(ptr) - (void *)&(((type *)0)->member)))
+
+static inline void container_of_test(void)
+{
+    struct Demo demo;
+    demo.key = "key";
+    demo.value = 1;
+    struct Demo *demo_p = container_of(&(demo.value), struct Demo, value);
+    assert(demo_p == &demo);
+    printf("key:%s, value:%d\n", demo_p->key, demo_p->value);
+
+}
 
 extern void rb_tree_test()
 {
     create_destroy_test();
     rotate_left_test();
+    container_of_test();
 }
 #endif

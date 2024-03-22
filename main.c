@@ -1,7 +1,9 @@
 #include "test.h"
 
-#include <stdio.h>
 
+#ifndef _TEST_
+#include <stdio.h>
+#endif
 
 
 int main(int argc, char **argv)
