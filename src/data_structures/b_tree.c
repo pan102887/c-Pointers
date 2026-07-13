@@ -1,9 +1,11 @@
 #include "b_tree.h"
 
-#include "m_def.h"
-
 #include <stdlib.h>
 #include <stdio.h>
+
+#ifndef CP_STATIC_INLINE
+#define CP_STATIC_INLINE static inline
+#endif
 
 #define CP_B_TREE_MAX(a, b) ((a) > (b) ? (a) : (b))
 

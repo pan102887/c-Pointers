@@ -1,7 +1,5 @@
 #include "b_tree_2.h"
 
-#include "m_def.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 
