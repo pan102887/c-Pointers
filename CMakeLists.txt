@@ -3,7 +3,23 @@ cmake_minimum_required(VERSION 3.20)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-project(c-demo LANGUAGES C CXX VERSION 0.1.0)
-file(GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/*.c ${CMAKE_SOURCE_DIR}/*.h ${CMAKE_SOURCE_DIR}/*.cpp)
+project(c-demo LANGUAGES C VERSION 0.1.0)
+
+find_package(Threads REQUIRED)
+
+file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
+    "${CMAKE_SOURCE_DIR}/src/*.c"
+    "${CMAKE_SOURCE_DIR}/src/*.h"
+)
+
+set(PROJECT_INCLUDE_DIRS "")
+foreach(PROJECT_SOURCE ${PROJECT_SOURCES})
+    get_filename_component(PROJECT_SOURCE_DIR "${PROJECT_SOURCE}" DIRECTORY)
+    list(APPEND PROJECT_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}")
+endforeach()
+list(REMOVE_DUPLICATES PROJECT_INCLUDE_DIRS)
+
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
-target_compile_definitions(${PROJECT_NAME} PUBLIC _TEST_)
+target_compile_definitions(${PROJECT_NAME} PRIVATE CP_ENABLE_TESTS MICRO=100)
+target_include_directories(${PROJECT_NAME} PRIVATE ${PROJECT_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads m)
